@@ -1,11 +1,15 @@
 const { boolean } = require("joi");
 const mongoose = require("mongoose");
+const { StudentModel } = require("./students.model");
 
 let classSchema = new mongoose.Schema({
-    
-    school_id: String,//reference
+
+    school_id: {
+        type: mongoose.Schema.ObjectId,
+        ref: "schools",
+    },
     name: String,
-    places:[Student],
+    places: [StudentModel],
     active: boolean,
     date_created: {
         type: Date,
@@ -14,4 +18,4 @@ let classSchema = new mongoose.Schema({
 });
 
 
-exports.ClassrModel = mongoose.model("classes", classSchema);
+exports.ClassModel = mongoose.model("classes", classSchema);
