@@ -1,5 +1,5 @@
 const express = require("express");
-const { auth, authAdmin } = require("../middleware/auth");
+const { auth, authRole } = require("../middleware/auth");
 const { userlCtrl } = require("../controllers/users.controllers");
 const { authCtrl } = require("../controllers/auth.controllers");
 const router = express.Router();
@@ -14,7 +14,7 @@ router.post("/login", authCtrl.login);
 
 router.get("/myInfo", auth, userlCtrl.getUserInfo);
 
-router.get("/usersList", authAdmin, userlCtrl.getAllUsers);
+router.get("/usersList", userlCtrl.getAllUsers);
 
 router.put("/:idEdit", auth, userlCtrl.editUser);
 
