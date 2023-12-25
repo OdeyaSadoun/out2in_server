@@ -16,7 +16,7 @@ exports.studentCtrl = {
    
   },
   getAllStudentsTeacher: async (req, res) => {
-
+    //todo get all student that connected to the teacher
   },
   getAllStudents: async (req, res) => {
     try {
@@ -26,6 +26,8 @@ exports.studentCtrl = {
         console.log(err);
         res.status(500).json({ msg: "err", err });
       }
+
+      //todo add all the data to the students
   },
   getStudentById: async (req, res) => {},
   getSocialRankForStudent: async (req, res) => {},
