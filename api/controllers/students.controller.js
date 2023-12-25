@@ -14,15 +14,18 @@ exports.studentCtrl = {
         res.status(500).json({ msg: "err", err });
       }   
   },
-  getAllStudentsTeacher: async (req, res) => {},
+  getAllStudentsTeacher: async (req, res) => {
+    //todo get all student that connected to the teacher
+  },
   getAllStudents: async (req, res) => {
     try {
-        let data = await StudentModel.find({}, { password: 0 });
+        let data = await StudentModel.find({});  
         res.json(data);
       } catch (err) {
         console.log(err);
         res.status(500).json({ msg: "err", err });
       }
+      //todo add all the data to the students
   },
   getStudentById: async (req, res) => {},
   getSocialRankForStudent: async (req, res) => {},
