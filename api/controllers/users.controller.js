@@ -2,19 +2,6 @@ const { userValidate } = require("../validations/users.validation");
 const { UserModel } = require("../models/users.model");
 
 exports.userlCtrl = {
-  getUserInfo: async (req, res) => {
-    try {
-      let userInfo = await UserModel.findOne(
-        { _id: req.tokenData._id },
-        { password: 0 }
-      );
-      res.json(userInfo);
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
-    }
-  },
-
   getAllUsers: async (req, res) => {
     try {
       let data = await UserModel.find({}, { password: 0 });

@@ -14,7 +14,7 @@ router.post("/login", authCtrl.login);
 
 router.post("/logout", authCtrl.logout);
 
-router.get("/myInfo", auth, userlCtrl.getUserInfo);
+// router.get("/myInfo", auth, userlCtrl.getUserInfo);
 
 router.get("/usersList",auth,authRole("admin"), userlCtrl.getAllUsers);
 
