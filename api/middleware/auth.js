@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const {config} = require("../config/secret")
+const {config} = require("../config/secret");
 
 exports.auth = (req,res,next) => {
   let token = req.header("x-api-key");
@@ -8,10 +8,7 @@ exports.auth = (req,res,next) => {
   }
   try{
     let decodeToken = jwt.verify(token,config.tokenSecret);
-    // add to req , so the next function will recognize
-    // the tokenData/decodeToken
     req.tokenData = decodeToken;
-
     next();
   }
   catch(err){
@@ -27,15 +24,11 @@ exports.authAdmin = (req,res,next) => {
   }
   try{
     let decodeToken = jwt.verify(token,config.tokenSecret);
-    // check if the role in the token of admin
     if(decodeToken.role != "admin"){
-      return res.status(401).json({msg:"Token invalid or expired, code: 3"})
+      return res.status(401).json({msg:"Token invalid or expired, code: 6A"})
     }
    
-    // add to req , so the next function will recognize
-    // the tokenData/decodeToken
     req.tokenData = decodeToken;
-
     next();
   }
   catch(err){

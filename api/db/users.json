@@ -1,0 +1,23 @@
+[
+  {
+    "first_name": "Odeya",
+    "last_name": "Sadoun",
+    "username": "osadoun",
+    "email": "odeya.sadoun@gmail.com",
+    "password": "123456"
+  },
+  {
+    "first_name": "Tamar",
+    "last_name": "Ben Eliyahu",
+    "username": "tben",
+    "email": "tben@gmail.com",
+    "password": "555555"
+  },
+  {
+    "first_name": "Orit",
+    "last_name": "Cohen",
+    "username": "orit",
+    "email": "orit@gmail.com",
+    "password": "222222"
+  }
+]
