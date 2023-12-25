@@ -1,9 +1,11 @@
 const express = require("express");
 const { auth, authRole } = require("../middleware/auth");
 const { studentCtrl } = require("../controllers/students.controller");
+const { getUserInfo } = require("../middleware/user");
+
 const router = express.Router();
 
-router.get("/students/info", auth, authRole("student"), studentCtrl.getStudentInfo);
+router.get("/students/info", auth, authRole("student"), getUserInfo, studentCtrl.getStudentInfo);
 
 router.get("students/studentsByTeacher", auth, authRole("teacher"), studentCtrl.getAllStudentsTeacher);
 
@@ -25,7 +27,7 @@ router.post("/students/questionnaire", auth, authRole("student"), studentCtrl.ad
 
 router.put("/students/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
 
-router.patch("/students/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.getAttendance);
+router.patch("/students/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.deleteStudent);
 
 module.exports = router;
 
