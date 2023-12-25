@@ -12,6 +12,8 @@ router.post("/register/student", authCtrl.registerStudent);
 
 router.post("/login", authCtrl.login);
 
+router.post("/logout", authCtrl.logout);
+
 router.get("/myInfo", auth, userlCtrl.getUserInfo);
 
 router.get("/usersList", userlCtrl.getAllUsers);
