@@ -25,7 +25,7 @@ exports.authCtrl = {
       let objPrincipal = { user_id: user._id, ...req.body.other };
       let principal = new PrincipalModel(objPrincipal);
       await principal.save();
-      res.status(201).json( principal);
+      res.status(201).json(principal);
     } catch (err) {
       if (err.code == 11000) {
         return res
