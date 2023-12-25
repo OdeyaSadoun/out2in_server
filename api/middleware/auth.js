@@ -3,7 +3,7 @@ const { config } = require("../config/secret");
 
 exports.authRole = (roles) => {
   return (req, res, next) => {
-    let token = req.header("x-api-key");
+    let token = req.cookies.access_token;
     try {
       let decodeToken = jwt.verify(token, config.tokenSecret);
       if (roles.indexOf(decodeToken.role) == -1) {
