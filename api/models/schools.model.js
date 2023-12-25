@@ -6,10 +6,14 @@ let schoolsSchema = new mongoose.Schema({
     address: String,
     phone: String,
     email: String,
-    active: Bool,
-    date_created:{
-        type:Date, default:Date.now()
+    active: {
+        type: Boolean,
+        default: true
+    },
+    date_created: {
+        type: Date,
+        default: Date.now()
     }
 
 });
-exports.SchoolsModel=mongoose.model("schools",schoolsSchema);
+exports.SchoolsModel = mongoose.model("schools", schoolsSchema);
