@@ -7,7 +7,6 @@ exports.authRole = (roles) => {
     try {
       let decodeToken = jwt.verify(token, config.tokenSecret);
       if (roles.indexOf(decodeToken.role) == -1) {
-        
         return res
           .status(401)
           .json({ msg: "Token invalid or expired, code: 6A" });
@@ -23,7 +22,7 @@ exports.authRole = (roles) => {
 };
 
 exports.auth = (req, res, next) => {
-  let token = req.header("x-api-key");
+  let token = req.cookies.access_token;
   if (!token) {
     return res
       .status(401)
