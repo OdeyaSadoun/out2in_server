@@ -25,7 +25,7 @@ exports.authCtrl = {
       let objPrincipal = { user_id: user._id, ...req.body.other };
       let principal = new PrincipalModel(objPrincipal);
       await principal.save();
-      res.status(201).json(user, principal);
+      res.status(201).json( principal);
     } catch (err) {
       if (err.code == 11000) {
         return res
@@ -80,7 +80,7 @@ exports.authCtrl = {
       let student = new StudentModel(objStudent);
 
       await student.save();
-      res.status(201).json(user, student);
+      res.status(201).json(student);
     } catch (err) {
       if (err.code == 11000) {
         return res
