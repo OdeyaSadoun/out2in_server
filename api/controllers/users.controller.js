@@ -32,12 +32,9 @@ exports.userlCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
-      console.log(req.tokenData);
+      
       let data;
-      if (req.tokenData.role == "admin") {
-        req.body.password = await bcrypt.hash(req.body.password, 10);
-        data = await UserModel.updateOne({ _id: idEdit }, req.body);
-      } else if (idEdit == req.tokenData._id) {
+      if (req.tokenData.role == "admin"||idEdit == req.tokenData._id) {
         req.body.password = await bcrypt.hash(req.body.password, 10);
         data = await UserModel.updateOne({ _id: idEdit }, req.body);
       } else {
@@ -60,10 +57,8 @@ exports.userlCtrl = {
     let idDelete = req.params.idDelete;
     try {
       let data;
-      if (req.tokenData.role == "admin") {
-        data = await UserModel.deleteOne({ _id: idDelete });
-      } else if (idDelete == req.tokenData._id) {
-        data = await UserModel.deleteOne({ _id: idDelete });
+      if (req.tokenData.role == "admin"||idDelete == req.tokenData._id) {
+        data = await UserModel.updateOne({ _id: idDelete },{'active':false});
       } else {
         data = [
           {
