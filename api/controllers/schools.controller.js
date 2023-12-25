@@ -17,5 +17,15 @@ exports.schoolsCtrl = {
             console.log(err);
             res.status(500).json({ msg: "err", err });
         }
+    },
+    getSchoolById: async (req, res) => {
+        let id = req.params.id;
+        try {
+            let data = await SchoolsModel.findOne({_id: id});
+            res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
     }
 }
