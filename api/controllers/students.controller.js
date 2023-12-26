@@ -8,15 +8,14 @@ exports.studentCtrl = {
     try {
       let studentInfo = await StudentModel.findOne({
         user_id: req.tokenData._id,
-      }).populate("user_id");
-      res.json({ user: req.userInfo, "student info": studentInfo });
+      }).populate("user_id", {"password": 0});
+      res.json(studentInfo);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
   getAllStudentsTeacher: async (req, res) => {
-    //todo get all student that connected to the teacher
     try {
       let data = await StudentModel.find({}).populate("user_id", {"password": 0});
       console.log(req.tokenData._id);
@@ -52,7 +51,18 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  getStudentById: async (req, res) => {},
+  getStudentById: async (req, res) => {
+    let student_id = req.params.id;
+    try {
+      let studentInfo = await StudentModel.findOne({
+        user_id: student_id,
+      }).populate("user_id", {"password": 0});
+      res.json(studentInfo);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
   getSocialRankForStudent: async (req, res) => {},
   getTheLowesSocialRankStudents: async (req, res) => {},
   getAllSocialRankStudents: async (req, res) => {},
