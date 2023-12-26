@@ -5,10 +5,39 @@ const { PrincipalModel } = require("../models/principals.model");
 const { TeacherModel } = require("../models/teachers.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
-const {
-  registerValidate,
-  loginValidate,
-} = require("../validations/auth.validation");
+const { registerValidate,loginValidate} = require("../validations/auth.validation");
+const nodemailer = require('nodemailer');
+
+const sendEmail =(req)=>{
+  console.log(req)
+  // Create a transporter with your SMTP configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'out2in.siders@gmail.com',
+    pass: 'htuc ubld vprw zfjr'
+  }
+});
+
+// Define the email options
+const mailOptions = {
+  from: 'out2in.siders@gmail.com',
+  to: req.email,
+  subject: req.subject,
+  text: req.text
+};
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  console.log("sendMail")
+  if (error) {
+    console.error('Error sending email:', error);
+  } else {
+    console.log('Email sent:', info.response);
+  }
+});
+
+}
 
 exports.authCtrl = {
   registerPrincipal: async (req, res) => {
@@ -22,11 +51,17 @@ exports.authCtrl = {
       user.password = await bcrypt.hash(user.password, 10);
       await user.save();
       user.password = "********";
-
       let objPrincipal = { user_id: user._id, ...req.body.other };
       let principal = new PrincipalModel(objPrincipal);
       await principal.save();
-      res.status(201).json(principal);
+      let toSend={
+        email: user.email,
+        subject: `Hi ${user.name}, this is a message from out2in`,
+        text: `To verify click here`
+      }
+      sendEmail(toSend)
+
+      res.status(201).json({ "details": user, "principal": principal });
     } catch (err) {
       if (err.code == 11000) {
         return res
@@ -49,6 +84,16 @@ exports.authCtrl = {
       );
       let objUser = { role: "teacher", ...req.body.user };
       let user = new UserModel(objUser);
+      
+      let toSend={
+        email: user.email,
+        subject: `Hi ${user.name}, this is a message from out2in`,
+        text: `${school.name} school principal has connected you to out2in, to connect click here,
+        Login details:
+         email: ${user.email},
+         password:${user.password}`
+      }
+      sendEmail(toSend)
       user.password = await bcrypt.hash(user.password, 10);
       await user.save();
       user.password = "********";
@@ -66,7 +111,8 @@ exports.authCtrl = {
             .json({ msg: "A teacher already exists in the system, add an existing teacher", code: 11000 });
         }
         console.log(err);
-        res.status(500).json({ msg: "err", err });}
+        res.status(500).json({ msg: "err", err });
+      }
     }
   },
 
