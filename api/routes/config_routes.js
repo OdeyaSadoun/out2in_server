@@ -4,6 +4,7 @@ const schoolsR = require("./schools");
 const teachersR = require("./teachers");
 const studentsR = require("./students");
 const classesR = require("./classes");
+const messagesR = require("./messages");
 
 exports.routesInit = (app) => {
   app.use("/", indexR);
@@ -12,4 +13,5 @@ exports.routesInit = (app) => {
   app.use("/teachers", teachersR);
   app.use("/students", studentsR);
   app.use("/classes", classesR);
+  app.use("/messages", messagesR);
 };
