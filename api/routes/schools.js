@@ -10,7 +10,7 @@ router.get("/",auth,authRole(["admin"]),schoolsCtrl.getAllSchools);
 router.get("/:id",auth,authRole(["admin","principal"]),schoolsCtrl.getSchoolById);
 router.post("/",auth,authRole(["admin","principal"]),schoolsCtrl.addSchool);
 router.put("/:id",auth,authRole(["admin","principal"]),schoolsCtrl.updateSchool);
-router.patch("/deleteSchool/:id",auth,authRole(["admin","principal"]),schoolsCtrl.changeActive);
+router.patch("/deleteSchool/:id",auth,authRole(["admin","principal"]),schoolsCtrl.deleteSchool);
 
 
 module.exports = router;

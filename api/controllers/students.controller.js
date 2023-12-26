@@ -2,12 +2,15 @@ const { userValidate } = require("../validations/users.validation");
 const { StudentModel } = require("../models/students.model");
 const { UserModel } = require("../models/users.model");
 const { TeacherModel } = require("../models/teachers.model");
+const { ClassModel } = require("../models/classes.model");
+const { SchoolsModel } = require("../models/schools.model");
+const { PrincipalModel } = require("../models/principals.model");
 
 exports.studentCtrl = {
   getStudentInfo: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
+    // if (!req.body.active && req.body.active != false) {
+    //   return res.status(400).json({ msg: "Need to send active in body" });
+    // }
     try {
       let studentInfo = await StudentModel.findOne({
         user_id: req.tokenData._id,
@@ -19,9 +22,9 @@ exports.studentCtrl = {
     }
   },
   getAllStudentsTeacher: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
+    // if (!req.body.active && req.body.active != false) {
+    //   return res.status(400).json({ msg: "Need to send active in body" });
+    // }
     try {
       let data = await StudentModel.find({}).populate("user_id", {
         password: 0,
@@ -41,9 +44,9 @@ exports.studentCtrl = {
     }
   },
   getAllStudents: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
+    // if (!req.body.active && req.body.active != false) {
+    //   return res.status(400).json({ msg: "Need to send active in body" });
+    // }
     try {
       let data = await StudentModel.find({}).populate("user_id", {
         password: 0,
@@ -85,24 +88,54 @@ exports.studentCtrl = {
   addNewQuestionnaireAnswer: async (req, res) => {},
   updateStudent: async (req, res) => {},
   deleteStudent: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
     try {
       let student_id = req.params.id;
+      let studentToDelete = await StudentModel.findOne({ _id: student_id });
       let data;
       if (req.tokenData.role == "admin")
-        data = await SchoolsModel.updateOne(
-          { _id: student_id },
-          { active: !req.body.active }
+        data = await UserModel.updateOne(
+          { _id: studentToDelete.user_id },
+          { $set: { active: false } }
         );
-      else if (req.tokenData.role == "principal") {
-        data = await SchoolsModel.updateOne(
-          { _id: schoolId },
-          { principal_id: req.tokenData._id },
-          { active: req.body.active }
-        );
-        console.log("principal_id", req.tokenData._id);
+      else {
+        if (req.tokenData.role == "teacher") {
+          console.log("teacher");
+          let teacher = await TeacherModel.findOne({
+            user_id: req.tokenData._id,
+          });
+          if (teacher.classes_list.includes(studentToDelete.class_id)) {
+            console.log("include");
+            //its mean that this teacher teach this student and can delete him
+            data = await UserModel.updateOne(
+              { _id: studentToDelete.user_id },
+              { $set: { active: false } }
+            );
+          } else {
+            res.status(403).json({
+              msg: "You do not have permission to delete a student who is not in your class",
+            });
+          }
+        } else if (req.tokenData.role == "principal") {
+          let classStudent = await ClassModel.findOne({
+            _id: studentToDelete.class_id,
+          });
+          let schoolStudent = await SchoolsModel.findOne({
+            _id: classStudent.school_id,
+          });
+          let principal = await PrincipalModel.findOne({
+            _id: schoolStudent.principal_id,
+          });
+          if (principal.user_id == req.tokenData._id) {
+            data = await UserModel.updateOne(
+              { _id: studentToDelete.user_id },
+              { $set: { active: false } }
+            );
+          } else {
+            res.status(403).json({
+              msg: "You do not have permission to delete a student who is not in your school",
+            });
+          }
+        }
       }
       res.json(data);
     } catch (err) {
