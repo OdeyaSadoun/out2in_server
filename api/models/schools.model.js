@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 let schoolsSchema = new mongoose.Schema({
     principal_id: {
         type:mongoose.Schema.ObjectId,
-        ref:"principals",
+        ref:"users"
       },
     name: String,
     address: String,
