@@ -5,29 +5,34 @@ const { UserModel } = require("../models/users.model");
 exports.studentCtrl = {
   getStudentInfo: async (req, res) => {
     try {
-        let studentInfo = await StudentModel.findOne(
-          { user_id: req.tokenData._id }
-        );
-        res.json({"user":req.userInfo,"student info":studentInfo});
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "err", err });
-      }   
+      let studentInfo = await StudentModel.findOne({
+        user_id: req.tokenData._id,
+      });
+      res.json({ user: req.userInfo, "student info": studentInfo });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
   },
   getAllStudentsTeacher: async (req, res) => {
     //todo get all student that connected to the teacher
   },
   getAllStudents: async (req, res) => {
     try {
-        let data = await StudentModel.find({});  
-        let studentJson = res.json(data);
-        studentJson.map(async stud => await UserModel.findOne({_id : user_id}));
-        res.json(studentJson);
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "err", err });
-      }
-      //todo add all the data to the students
+      let data = await StudentModel.find({});
+
+      let studentJson = await Promise.all(data.map(async (stud) => {
+        const userData = await UserModel.findOne({ _id: stud.user_id });
+        return { student: stud, user: userData };
+      }));
+      
+      console.log(studentJson);
+      res.json(studentJson);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+    //todo add all the data to the students
   },
   getStudentById: async (req, res) => {},
   getSocialRankForStudent: async (req, res) => {},
