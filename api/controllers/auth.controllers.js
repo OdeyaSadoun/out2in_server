@@ -60,13 +60,13 @@ exports.authCtrl = {
       res.status(201).json(teacher);
     } catch (err) {
       if (err.code == 11000) {
-        res.json({"err":err})
-        // let upUser=await UserModel.findOne({idCard: req.body.user.idCard })
-        // let upTeacher=await TeacherModel.findOne({user_id: upUser._id })
-
-      }
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
+        if (err.code == 11000) {
+          return res
+            .status(500)
+            .json({ msg: "A teacher already exists in the system, add an existing teacher", code: 11000 });
+        }
+        console.log(err);
+        res.status(500).json({ msg: "err", err });}
     }
   },
 

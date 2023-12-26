@@ -35,6 +35,25 @@ exports.teacherlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  addSchool:async(req,res)=>{
+    let id=req.params.id
+    let school = await SchoolsModel.findOne(
+      { principal_id: req.tokenData._id }
+    );
+    try{
+      let user=await UserModel.findOne({idCard: id})
+      let teacher=await TeacherModel.findOne({user_id: user._id})
+      let array=teacher.schools_list
+      array.push(school._id)
+      let upTeacher=await TeacherModel.updateOne({user_id: user._id},{ $set: { "schools_list": array} })
+      res.json(upTeacher)
+    }
+    catch(err){
+      res.json({"err from add school":err})
+    }
+    
+
+  }
 
 
 

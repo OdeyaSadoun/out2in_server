@@ -8,4 +8,7 @@ const router = express.Router();
 
 router.get("/myInfo",auth, authRole('teacher'),getUserInfo, teacherlCtrl.getTeacherInfo);
 router.get("/getAllTeachers",auth, authRole('principal'), teacherlCtrl.getAllTeachers);
+router.patch("/addSchool/:id",auth, authRole('principal'), teacherlCtrl.addSchool);
+
+
 module.exports = router;
