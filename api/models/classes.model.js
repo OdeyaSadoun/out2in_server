@@ -1,4 +1,3 @@
-const { boolean } = require("joi");
 const mongoose = require("mongoose");
 const { StudentModel } = require("./students.model");
 
@@ -9,8 +8,17 @@ let classSchema = new mongoose.Schema({
         ref: "schools",
     },
     name: String,
-    places: [StudentModel],
-    active: boolean,
+    places: [{
+       stud1: {
+            type: mongoose.Schema.ObjectId,
+            ref: "students",
+        },
+        stud2: {
+            type: mongoose.Schema.ObjectId,
+            ref: "students",
+        },
+    }],
+    active: Boolean,
     date_created: {
         type: Date,
         default: Date.now(),
