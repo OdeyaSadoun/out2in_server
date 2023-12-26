@@ -1,5 +1,6 @@
 const { classValidate } = require("../validations/classes.validation");
 const { ClassModel } = require("../models/classes.model");
+const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 
 exports.classCtrl = {
