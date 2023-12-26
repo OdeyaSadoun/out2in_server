@@ -3,6 +3,7 @@ const { createToken } = require("../helpers/auth.helper");
 const { UserModel } = require("../models/users.model");
 const { PrincipalModel } = require("../models/principals.model");
 const { TeacherModel } = require("../models/teachers.model");
+const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 const {
   registerValidate,
@@ -43,6 +44,9 @@ exports.authCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
+      let school = await SchoolsModel.findOne(
+        { principal_id: req.tokenData._id }
+      );
       let objUser = { role: "teacher", ...req.body.user };
       let user = new UserModel(objUser);
       user.password = await bcrypt.hash(user.password, 10);
@@ -50,14 +54,16 @@ exports.authCtrl = {
       user.password = "********";
 
       let objTeacher = { user_id: user._id, ...req.body.other };
+      objTeacher.schools_list.push(school._id)
       let teacher = new TeacherModel(objTeacher);
       await teacher.save();
       res.status(201).json(teacher);
     } catch (err) {
       if (err.code == 11000) {
-        return res
-          .status(500)
-          .json({ msg: "Id already in system, try log in", code: 11000 });
+        res.json({"err":err})
+        // let upUser=await UserModel.findOne({idCard: req.body.user.idCard })
+        // let upTeacher=await TeacherModel.findOne({user_id: upUser._id })
+
       }
       console.log(err);
       res.status(500).json({ msg: "err", err });
