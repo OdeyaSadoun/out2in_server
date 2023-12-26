@@ -12,8 +12,8 @@ let messageSchema = new mongoose.Schema({
       },
       title: String,
       value: String,
-      read: Bool,
-      active: Bool,
+      read: Boolean,
+      active: Boolean,
       date_created: {
         type: Date,
         default: Date.now(),

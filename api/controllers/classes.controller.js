@@ -1,5 +1,5 @@
-const { classValidate } = require("../validations/class.validation");
-const { ClassModel } = require("../models/class.model");
+const { classValidate } = require("../validations/classes.validation");
+const { ClassModel } = require("../models/classes.model");
 const { StudentModel } = require("../models/students.model");
 
 exports.classCtrl = {
