@@ -20,7 +20,9 @@ exports.studentCtrl = {
   getAllStudents: async (req, res) => {
     try {
         let data = await StudentModel.find({});  
-        res.json(data);
+        let studentJson = res.json(data);
+        studentJson.map(async stud => await UserModel.findOne({_id : user_id}));
+        res.json(studentJson);
       } catch (err) {
         console.log(err);
         res.status(500).json({ msg: "err", err });
