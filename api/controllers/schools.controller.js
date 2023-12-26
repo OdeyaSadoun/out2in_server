@@ -62,14 +62,40 @@ exports.schoolsCtrl = {
             return res.status(400).json(valdiateBody.error.details)
         }
         try {
-            let school = new SchoolsModel(req.body);
-            school.principal_id = req.tokenData._id;
-            await school.save();
-            res.status(201).json(school)
+            let idEdit = req.params.id
+            let data;
+            if (req.tokenData.role == "admin") {
+              data = await SchoolsModel.updateOne({ _id: idEdit }, req.body);
+            }
+            else {
+              data = await SchoolsModel.updateOne({ _id: idEdit, principal_id: req.tokenData._id }, req.body);
+            }
+            res.json(data);
+        }
+        catch (err) {
+            console.log(err)
+            res.status(500).json({ msg: "err", err })
+        }
+    },
+    changeActive: async (req, res) => {
+        if (!req.body.active && req.body.active != false) {
+            return res.status(400).json({ msg: "Need to send active in body" });
+        }
+        try {
+            let schoolId = req.params.id
+            let data;
+            if (req.tokenData.role == "admin")
+                data = await SchoolsModel.updateOne({ _id: schoolId }, { active: req.body.active })
+            else if(req.tokenData.role == "principal") {
+                data = await SchoolsModel.updateOne({ _id: schoolId }, { principal_id: req.tokenData._id }, { active: req.body.active })
+                console.log("principal_id", req.tokenData._id);
+            }
+            res.json(data);
         }
         catch (err) {
             console.log(err)
             res.status(500).json({ msg: "err", err })
         }
     }
+
 }
