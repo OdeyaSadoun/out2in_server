@@ -1,33 +1,56 @@
 const { userValidate } = require("../validations/users.validation");
 const { StudentModel } = require("../models/students.model");
 const { UserModel } = require("../models/users.model");
+const { TeacherModel } = require("../models/teachers.model");
 
 exports.studentCtrl = {
   getStudentInfo: async (req, res) => {
     try {
-        let studentInfo = await StudentModel.findOne(
-          { user_id: req.tokenData._id }
-        );
-        res.json({"user":req.userInfo,"student info":studentInfo});
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "err", err });
-      }   
+      let studentInfo = await StudentModel.findOne({
+        user_id: req.tokenData._id,
+      }).populate("user_id");
+      res.json({ user: req.userInfo, "student info": studentInfo });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
   },
   getAllStudentsTeacher: async (req, res) => {
     //todo get all student that connected to the teacher
+    try {
+      let data = await StudentModel.find({}).populate("user_id", {"password": 0});
+      console.log(req.tokenData._id);
+      let teacher = await TeacherModel.findOne({user_id: req.tokenData._id});
+
+      console.log(teacher);
+      let studentJson =
+        data.filter((stud) => {
+          return teacher.classes_list.includes(stud.class_id);
+        })
+      ;
+      console.log(studentJson);
+      res.json(studentJson);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
   },
   getAllStudents: async (req, res) => {
     try {
-        let data = await StudentModel.find({});  
-        let studentJson = res.json(data);
-        studentJson.map(async stud => await UserModel.findOne({_id : user_id}));
-        res.json(studentJson);
-      } catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "err", err });
-      }
-      //todo add all the data to the students
+      let data = await StudentModel.find({}).populate("user_id", {"password": 0});
+
+      // let studentJson = await Promise.all(
+      //   data.map(async (stud) => {
+      //     const userData = await UserModel.findOne({ _id: stud.user_id });
+      //     return { student: stud, user: userData };
+      //   })
+      // );
+      console.log(data);
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
   },
   getStudentById: async (req, res) => {},
   getSocialRankForStudent: async (req, res) => {},
