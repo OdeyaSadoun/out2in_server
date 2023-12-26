@@ -4,10 +4,9 @@ const { UserModel } = require("../models/users.model");
 const { SchoolsModel } = require("../models/schools.model");
 
 
+
 exports.teacherlCtrl = {
   getTeacherInfo: async (req, res) => {
-
-    // res.json(req.userInfo)
     try {
       let teacherInfo = await TeacherModel.findOne(
         { user_id: req.tokenData._id }
@@ -17,21 +16,26 @@ exports.teacherlCtrl = {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
-
-
   },
   getAllTeachers: async (req, res) => {
     try {
-      console.log(req.tokenData._id)
-      let school = await SchoolsModel.findOne({ principal_id: req.tokenData._id });
-      console.log("school", school)
-      let data = await TeacherModel.find({});
-      res.json(data);
+      let school = await SchoolsModel.findOne(
+        { principal_id: req.tokenData._id }
+      );
+      let data = await TeacherModel.find({}).populate("user_id", { "password": 0 });
+      let teacherByPrincipal = data.filter(teach => teach.schools_list.includes(school._id))
+      if (req.tokenData.role == "admin") {
+        res.json(data);
+      }
+      else
+        res.json(teacherByPrincipal);
+
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
+
 
 
 };
