@@ -1,7 +1,7 @@
 const { TeacherModel } = require("../models/teachers.model");
-const { userlCtrl } = require("../controllers/users.controller");
 const { UserModel } = require("../models/users.model");
 const { SchoolsModel } = require("../models/schools.model");
+const bcrypt = require("bcrypt");
 
 
 
@@ -9,7 +9,7 @@ exports.teacherlCtrl = {
   getTeacherInfo: async (req, res) => {
     try {
       let teacherInfo = await TeacherModel.findOne(
-        { user_id: req.tokenData._id }
+        { user_id: req.tokenData._id  }
       );
       res.json({ "user": req.userInfo, "teacher info": teacherInfo });
     } catch (err) {
@@ -53,6 +53,35 @@ exports.teacherlCtrl = {
     }
     
 
+  },
+  editTeacher: async(req,res)=>{
+    let idEdit = req.params.id;
+    let user=await UserModel.findOne({_id: req.tokenData._id})
+    let userUp=await UserModel.findOne({idCard: idEdit})
+    // let validBody = userValidate(req.body);
+    // if (validBody.error) {
+    //   return res.status(400).json(validBody.error.details);
+    // }
+    try {
+      let data;
+      if ((req.tokenData.role == "admin"||idEdit == user.idCard)&&userUp.role=="teacher") {
+        req.body.user.password = await bcrypt.hash(req.body.user.password, 10);
+        data = await UserModel.updateOne({ idCard: idEdit }, req.body.user);
+        let teacher= await TeacherModel.updateOne({user_id:userUp._id},req.body.other)
+        data={"updateUser":data.modifiedCount,"updateTeacher":teacher.modifiedCount}
+      } else {
+        data = [
+          {
+            status: "failed",
+            msg: "You are trying to do an operation that is not enabled!",
+          },
+        ];
+      }
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ err });
+    }
   }
 
 

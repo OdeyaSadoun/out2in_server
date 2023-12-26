@@ -18,8 +18,12 @@ router.post("/logout", authCtrl.logout);
 
 router.get("/usersList",auth,authRole("admin"), userlCtrl.getAllUsers);
 
-router.put("/:idEdit", auth, userlCtrl.editUser);
+router.put("/edit/:idEdit", auth, userlCtrl.editUser);
 
-router.patch("/:idDelete", auth, userlCtrl.deleteUser);
+router.patch("/delete/:idDelete", auth, userlCtrl.deleteUser);
+
+router.patch("/changePassword", auth, authCtrl.changePassword);
+
+router.patch("/active/:id", authCtrl.activeTrue);
 
 module.exports = router;
