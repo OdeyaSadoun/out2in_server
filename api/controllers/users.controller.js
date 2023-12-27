@@ -15,7 +15,10 @@ exports.userlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-
+getCurrentUser: async (req, res) => {
+  let data = await UserModel.findOne({_id:req.tokenData._id}, { password: 0 });
+  res.json(data);
+},
   editUser: async (req, res) => {
     let idEdit = req.params.idEdit;
     let validBody = userValidate(req.body);

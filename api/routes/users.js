@@ -17,6 +17,7 @@ router.post("/logout", authCtrl.logout);
 // router.get("/myInfo", auth, userlCtrl.getUserInfo);
 
 router.get("/usersList",auth,authRole("admin"), userlCtrl.getAllUsers);
+router.get("/getCurrentUser",auth, userlCtrl.getCurrentUser);
 
 router.put("/edit/:idEdit", auth, userlCtrl.editUser);
 
