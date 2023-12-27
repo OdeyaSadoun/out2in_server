@@ -71,34 +71,13 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  getSocialRankForStudent: async (req, res) => { },
-  getTheLowesSocialRankStudents: async (req, res) => { },
-  getAllSocialRankStudents: async (req, res) => { },
-  getAttendance: async (req, res) => { },
-  getAttendanceForStudent: async (req, res) => { },
-  addNewQuestionnaireAnswer: async (req, res) => { },
-  updateStudent: async (req, res) => { },
-  addSubject: async (req, res) => {
-    try {
-      let studentID = req.body.studentId;
-      let subjectID = req.body.subjectId;
-
-      let student = await StudentModel.findOne({ user_id: studentID })
-      if (!student) {
-        res.json({"mag":"Student does not exist"})
-        return
-      }
-      let arrayS=student.subjects_list
-      arrayS.push(subjectID)
-      let data =await StudentModel.updateOne({user_id:studentID}, { $set: { "subjects_list": arrayS } })
-
-res.json(data)
-    }
-    catch (err) {
-res.status(400).json(err)
-    }
-
-  }
+  getSocialRankForStudent: async (req, res) => {},
+  getTheLowesSocialRankStudents: async (req, res) => {},
+  getAllSocialRankStudents: async (req, res) => {},
+  getAttendance: async (req, res) => {},
+  getAttendanceForStudent: async (req, res) => {},
+  addNewQuestionnaireAnswer: async (req, res) => {},
+  updateStudent: async (req, res) => {},
   // deleteStudent: async (req, res) => {
   //   try {
   //     let student_id = req.params.id;

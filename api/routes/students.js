@@ -23,12 +23,9 @@ router.get("/attendance", auth, authRole("teacher"), studentCtrl.getAttendance);
 
 router.get("/attendance/:id", auth, authRole("teacher"), studentCtrl.getAttendanceForStudent);
 
-router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuestionnaireAnswer);
+// router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuestionnaireAnswer);
 
 router.put("/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
-
-router.patch('/addSubject',auth,authRole(["teacher"]),studentCtrl.addSubject);//subject id and student id send in body
-
 
 // router.patch("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.deleteStudent);
 
