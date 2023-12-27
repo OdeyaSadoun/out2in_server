@@ -19,6 +19,7 @@ def make_directed_graph_for_connections_between_students(friends_list):
     # הדפסת הגרף בתצוגה ויזואלית
     nx.draw(g, with_labels=True)
     plt.show()
+    return g
 
 
 def out_degree(g, node):
@@ -30,29 +31,35 @@ def in_degree(g, node):
     return sum([1 for edge in edges if edge[1] == node])
 
 
+def normalize(degree):
+    if degree == 0:
+        return 0
+    return degree / max(degree)
+
+
 def statistic(vertex, g):
     # 1:
-    # global g
-    din = in_degree(g, vertex)  # n-1
-    din = din / 5 * 100
+    din = in_degree(g, vertex)
+    din = normalize(din)
 
     # 2:
     dout = out_degree(g, vertex)
-    dout = dout / 3 * 100
+    dout = normalize(dout)
 
     # 3:
     # degree = din + dout
-    pre = g.predecessors(vertex)  # din
-    suc = g.successors(vertex)  # dout
+    pre = g.predecessors(vertex)
+    suc = g.successors(vertex)
     count = 0
     for item in suc:
         if item in pre:
             count = count + 1
-    # print(vertex,count)
-    count = 1 / 3 * count * 100
+    count = normalize(count)
+
     final = round(1 / 3 * din + 1 / 3 * dout + 1 / 3 * count, 1)
-    # ...
+
     return final
+
 
 def scanGraph(g):
     d = {}
