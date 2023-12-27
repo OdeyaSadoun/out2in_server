@@ -71,67 +71,37 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+
   getSocialRankForStudent: async (req, res) => {},
   getTheLowesSocialRankStudents: async (req, res) => {},
   getAllSocialRankStudents: async (req, res) => {},
   getAttendance: async (req, res) => {},
   getAttendanceForStudent: async (req, res) => {},
-  addNewQuestionnaireAnswer: async (req, res) => {},
-  updateStudent: async (req, res) => {},
-  // deleteStudent: async (req, res) => {
-  //   try {
-  //     let student_id = req.params.id;
-  //     let studentToDelete = await StudentModel.findOne({ _id: student_id });
-  //     let data;
-  //     if (req.tokenData.role == "admin")
-  //       data = await UserModel.updateOne(
-  //         { _id: studentToDelete.user_id },
-  //         { $set: { active: false } }
-  //       );
-  //     else {
-  //       if (req.tokenData.role == "teacher") {
-  //         console.log("teacher");
-  //         let teacher = await TeacherModel.findOne({
-  //           user_id: req.tokenData._id,
-  //         });
-  //         if (teacher.classes_list.includes(studentToDelete.class_id)) {
-  //           console.log("include");
-  //           //its mean that this teacher teach this student and can delete him
-  //           data = await UserModel.updateOne(
-  //             { _id: studentToDelete.user_id },
-  //             { $set: { active: false } }
-  //           );
-  //         } else {
-  //           res.status(403).json({
-  //             msg: "You do not have permission to delete a student who is not in your class",
-  //           });
-  //         }
-  //       } else if (req.tokenData.role == "principal") {
-  //         let classStudent = await ClassModel.findOne({
-  //           _id: studentToDelete.class_id,
-  //         });
-  //         let schoolStudent = await SchoolsModel.findOne({
-  //           _id: classStudent.school_id,
-  //         });
-  //         let principal = await PrincipalModel.findOne({
-  //           _id: schoolStudent.principal_id,
-  //         });
-  //         if (principal.user_id == req.tokenData._id) {
-  //           data = await UserModel.updateOne(
-  //             { _id: studentToDelete.user_id },
-  //             { $set: { active: false } }
-  //           );
-  //         } else {
-  //           res.status(403).json({
-  //             msg: "You do not have permission to delete a student who is not in your school",
-  //           });
-  //         }
-  //       }
-  //     }
-  //     res.json(data);
-  //   } catch (err) {
-  //     console.log(err);
-  //     res.status(500).json({ msg: "err", err });
-  //   }
-  // },
+  // addNewQuestionnaireAnswer: async (req, res) => {},
+
+  updateStudent: async (req, res) => {
+    let idEdit = req.params.id;
+    let user=await UserModel.findOne({_id: req.tokenData._id})
+    let userUp=await UserModel.findOne({idCard: idEdit})
+    try {
+      let data;
+      if ((req.tokenData.role == "admin"|| idEdit == user.idCard) && userUp.role=="student") {
+        req.body.user.password = await bcrypt.hash(req.body.user.password, 10);
+        data = await UserModel.updateOne({ idCard: idEdit }, req.body.user);
+        let student= await StudentModel.updateOne({user_id: userUp._id}, req.body.other)
+        data={"updateUser":data.modifiedCount,"updateStudent":student.modifiedCount}
+      } else {
+        data = [
+          {
+            status: "failed",
+            msg: "You are trying to do an operation that is not enabled!",
+          },
+        ];
+      }
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ err });
+    }
+  }
 };
