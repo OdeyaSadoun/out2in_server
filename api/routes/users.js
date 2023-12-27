@@ -20,7 +20,7 @@ router.get("/usersList",auth,authRole("admin"), userlCtrl.getAllUsers);
 
 router.put("/edit/:idEdit", auth, userlCtrl.editUser);
 
-router.patch("/delete/:idDelete", auth, userlCtrl.deleteUser);
+router.patch("/delete/", auth,authRole(["admin","teacher","principal"]), userlCtrl.deleteUser);
 
 router.patch("/changePassword", auth, authCtrl.changePassword);
 

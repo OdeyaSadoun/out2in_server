@@ -45,13 +45,13 @@ exports.userlCtrl = {
 
   deleteUser: async (req, res) => {
 
-    let idDelete = req.params.idDelete;
+    let idDelete = req.body.idCard;
     try {
       let data;
       let user = await UserModel.findOne({ _id: req.tokenData._id });
       let userUp = await UserModel.findOne({ idCard: idDelete });
       console.log(userUp)
-      if (req.tokenData.role == "admin" || idDelete == user.idCard) {
+      if (req.tokenData.role == "admin" || (idDelete == user.idCard&&req.tokenData.role == "principal")) {
         data = await UserModel.updateOne({ _id: userUp._id }, { $set: { "active": false } });
       }
       else if (req.tokenData.role == "principal") {
