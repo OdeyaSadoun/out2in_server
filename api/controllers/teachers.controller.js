@@ -35,6 +35,10 @@ exports.teacherlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  getClasses:async(req,res)=>{
+    let data =await TeacherModel.findOne({user_id:req.tokenData._id}).populate("classes_list")
+    res.json(data.classes_list)
+  },
   addSchool:async(req,res)=>{
     let id=req.params.id
     let school = await SchoolsModel.findOne(
