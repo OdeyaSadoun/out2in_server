@@ -27,7 +27,7 @@ router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuest
 
 router.put("/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
 
-router.patch("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.deleteStudent);
+// router.patch("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.deleteStudent);
 
 module.exports = router;
 
