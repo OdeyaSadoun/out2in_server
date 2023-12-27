@@ -62,7 +62,7 @@ exports.friendCtrl = {
   calc: async (req, res) => {
     try {
       // const pythonCode = "print('hello world')";
-      let n = `api/algorithms/python_files/hello.py`
+      let n = `api/algorithms/python_files/main.py`
       const result = await runPythonScript(n);
       console.log("Python script executed successfully:", result);
   
