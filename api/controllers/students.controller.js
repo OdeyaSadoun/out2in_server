@@ -8,9 +8,6 @@ const { PrincipalModel } = require("../models/principals.model");
 
 exports.studentCtrl = {
   getStudentInfo: async (req, res) => {
-    // if (!req.body.active && req.body.active != false) {
-    //   return res.status(400).json({ msg: "Need to send active in body" });
-    // }
     try {
       let studentInfo = await StudentModel.findOne({
         user_id: req.tokenData._id,
@@ -22,9 +19,6 @@ exports.studentCtrl = {
     }
   },
   getAllStudentsTeacher: async (req, res) => {
-    // if (!req.body.active && req.body.active != false) {
-    //   return res.status(400).json({ msg: "Need to send active in body" });
-    // }
     try {
       let data = await StudentModel.find({}).populate("user_id", {
         password: 0,
@@ -44,9 +38,6 @@ exports.studentCtrl = {
     }
   },
   getAllStudents: async (req, res) => {
-    // if (!req.body.active && req.body.active != false) {
-    //   return res.status(400).json({ msg: "Need to send active in body" });
-    // }
     try {
       let data = await StudentModel.find({}).populate("user_id", {
         password: 0,
