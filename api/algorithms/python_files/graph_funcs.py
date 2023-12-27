@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import networkx as nx
+import numpy as np
 
 friends_list = [{"student": 1, "friends": [2,3,4]},{"student": 2, "friends": [5,3,4]},{"student": 5, "friends": [2,3,4]},{"student": 4, "friends": [2,5,1]}]
 
@@ -38,6 +39,7 @@ def normalize(degree):
 
 
 def statistic(vertex, g):
+
     # 1:
     din = in_degree(g, vertex)
     din = normalize(din)
@@ -67,4 +69,23 @@ def scanGraph(g):
         d[node] = (in_degree(g, node), out_degree(g, node))
         # print(node, in_degree2(g,node),out_degree(g,node))
     return d
+
+
+def calc_social_index_students(friends_list):
+
+    friends_array = np.array(friends_list)
+    g = make_directed_graph_for_connections_between_students(friends_array)
+
+    d = scanGraph(g)
+
+    d_statistic = {}
+
+    for key in d:
+        mark = statistic(key, g)
+        for node in list(g):
+            if node == key:
+                d_statistic[node] = mark
+     
+    return d_statistic
+
 

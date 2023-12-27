@@ -32,10 +32,11 @@ exports.runPythonCode = (code) => {
     });
   };
   
-  exports.callPythonFunction = (functionName, args) => {
+  exports.callPythonFunction = (url, file, functionName, args) => {
+    console.log("ho");
     return new Promise((resolve, reject) => {
-      const formattedArgs = args.join(', '); // Convert array of arguments to a comma-separated string
-      const command = `python -c "import sys; sys.path.append('path_to_python_file'); from python_module import ${functionName}; print(${functionName}(${formattedArgs}));"`;
+      const formattedArgs = args.map(arg => JSON.stringify(arg)).join(', ');
+      const command = `python -c "import sys; sys.path.append('${url}'); from ${file} import ${functionName} ; print(${functionName}(${formattedArgs}));"`;
       exec(command, (error, stdout, stderr) => {
         if (error) {
           reject(error);
@@ -49,3 +50,4 @@ exports.runPythonCode = (code) => {
       });
     });
   };
+  
