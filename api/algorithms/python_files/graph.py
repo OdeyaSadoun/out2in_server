@@ -1,20 +1,34 @@
 from matplotlib import pyplot as plt
-import numpy as np
-import csv
 import networkx as nx
-from collections import defaultdict
-import json
 
-# import matplotlib.pyplot as plt
+friends_list = [{"student": 1, "friends": [2,3,4]},{"student": 2, "friends": [5,3,4]},{"student": 5, "friends": [2,3,4]},{"student": 4, "friends": [2,5,1]}]
+
+def make_directed_graph_for_connections_between_students(friends_list):
+    g = nx.DiGraph()
+
+    # הוספת הצמתים לגרף
+    #maybe not neccery
+    for student in friends_list:
+        g.add_node(student["student"])
+
+    # הוספת הקשתות לגרף
+    for student in friends_list:
+        for friend in student["friends"]:
+            g.add_edge(student["student"], friend)
+
+    # הדפסת הגרף בתצוגה ויזואלית
+    nx.draw(g, with_labels=True)
+    plt.show()
 
 
 def out_degree(g, node):
     return len(list(g.neighbors(node)))
 
-# print(list(g.neighbors('E')))
+
 def in_degree(g, node):
     edges = list(g.edges)
     return sum([1 for edge in edges if edge[1] == node])
+
 
 def statistic(vertex, g):
     # 1:
@@ -47,20 +61,3 @@ def scanGraph(g):
         # print(node, in_degree2(g,node),out_degree(g,node))
     return d
 
-friends_list = [{"student": 1, "friends": [2,3,4]},{"student": 2, "friends": [5,3,4]},{"student": 5, "friends": [2,3,4]},{"student": 4, "friends": [2,5,1]}]
-
-def make_directed_graph_for_connections_between_students(friends_list):
-    g = nx.DiGraph()
-
-    # הוספת הצמתים לגרף
-    for student in friends_list:
-        g.add_node(student["student"])
-
-    # הוספת הקשתות לגרף
-    for student in friends_list:
-        for friend in student["friends"]:
-            g.add_edge(student["student"], friend)
-
-    # הדפסת הגרף בתצוגה ויזואלית
-    nx.draw(g, with_labels=True)
-    plt.show()

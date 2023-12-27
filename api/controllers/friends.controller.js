@@ -36,6 +36,24 @@ const runPythonScript = (scriptPath) => {
   });
 };
 
+const callPythonFunction = (functionName, args) => {
+  return new Promise((resolve, reject) => {
+    const formattedArgs = args.join(', '); // Convert array of arguments to a comma-separated string
+    const command = `python -c "import sys; sys.path.append('path_to_python_file'); from python_module import ${functionName}; print(${functionName}(${formattedArgs}));"`;
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      if (stderr) {
+        reject(stderr);
+        return;
+      }
+      resolve(stdout.trim());
+    });
+  });
+};
+
 exports.friendCtrl = {
   addNewQuestionnaireAnswer: async (req, res) => {
     try {
@@ -61,10 +79,13 @@ exports.friendCtrl = {
   },
   calc: async (req, res) => {
     try {
+      
+
       // const pythonCode = "print('hello world')";
-      let n = `api/algorithms/python_files/main.py`
-      const result = await runPythonScript(n);
-      console.log("Python script executed successfully:", result);
+      const functionName = 'your_python_function'; // Replace this with your Python function name
+      const args = ['arg1', 'arg2', 'arg3']; // Replace with multiple arguments for the Python function
+      const result = await callPythonFunction(functionName, args);
+      console.log("Result from Python function:", result);
   
       // Send the result back in the response if needed
       res.status(200).json({ result });
