@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 
 let userSchema = new mongoose.Schema({
-  idCard: String,
+  idCard: {type:String, unique:true},
   name: String,
   address: String,
   phone: String,
