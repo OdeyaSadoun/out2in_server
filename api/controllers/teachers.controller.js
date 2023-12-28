@@ -11,7 +11,7 @@ exports.teacherlCtrl = {
       let teacherInfo = await TeacherModel.findOne(
         { user_id: req.tokenData._id  }
       );
-      res.json({ "user": req.userInfo, "teacher info": teacherInfo });
+      res.json({ "user": req.userInfo, "other": teacherInfo });
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
