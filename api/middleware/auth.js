@@ -22,9 +22,7 @@ exports.authRole = (roles) => {
 };
 
 exports.auth = (req, res, next) => {
-  console.log(req.header);
   let token = req.header("x-api-key");
-  console.log(token);
   if (!token) {
     return res
       .status(401)
