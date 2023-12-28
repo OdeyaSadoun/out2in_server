@@ -34,7 +34,7 @@ exports.friendCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  calcSocialIndexStudents: async (req, res) => {
+  calcSocialIndexStudentsByQuestionnaire: async (req, res) => {
     try {
       const { friends_list } = req.body;
       console.log("friends_list", friends_list);
