@@ -5,19 +5,24 @@ const { FriendModel } = require("../models/friends.model");
 exports.friendCtrl = {
   addNewQuestionnaireAnswer: async (req, res) => {
     try {
-      const friends_list = req.body.friends_list;
-      const student_id = req.body.student_id;
+
+      const friends_list = req.body.friends;
+      const student = req.tokenData._id;
       let newAnswer;
 
-      if (!student_id) {
+      console.log(friends_list);
+
+      if (!student) {
         return res.status(404).json({ error: "Student not found" });
       }
       if (friends_list.length > 0) {
         newAnswer = new FriendModel({
-          user_id: student_id,
-          friends_list,
+          "student": student,
+          "friends": friends_list,
         });
       }
+
+      console.log(newAnswer);
       await newAnswer.save();
       res.status(201).json(newAnswer);
     } catch (error) {
@@ -36,7 +41,8 @@ exports.friendCtrl = {
   },
   calcSocialIndexStudentsByQuestionnaire: async (req, res) => {
     try {
-      const { friends_list } = req.body;
+      console.log(" req.body", req.body);
+      const  friends_list  = req.body;
       console.log("friends_list", friends_list);
       try {
         const response = await axios.post(
@@ -54,7 +60,7 @@ exports.friendCtrl = {
         console.error("Error:", error);
         res.status(500).json({ error: "Internal Server Error" });
       }
-    } catch (error) {
+    } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }

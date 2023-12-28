@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 let friendSchema = new mongoose.Schema({
-  user_id: {
+  student: {
     type: mongoose.Schema.ObjectId,
     ref: "users",
   },
