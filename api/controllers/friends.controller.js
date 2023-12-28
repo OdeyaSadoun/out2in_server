@@ -1,6 +1,5 @@
 // const py = require("py");
 const { default: axios } = require("axios");
-const { callPythonFunction } = require("../helpers/python.helper");
 const { FriendModel } = require("../models/friends.model");
 
 exports.friendCtrl = {
