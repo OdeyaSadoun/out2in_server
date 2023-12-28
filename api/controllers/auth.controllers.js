@@ -170,6 +170,10 @@ exports.authCtrl = {
         return res.status(401).json({ msg: "Wrong password" });
       }
       let token = createToken(user._id, user.role);
+      // res.cookie("access_token", token, {
+      //   maxAge: 60 * 60 * 1000,
+      //   httpOnly: true,
+      // });
       res.cookie("access_token", token, {
         maxAge: 60 * 60 * 1000,
         httpOnly: true,

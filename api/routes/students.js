@@ -23,7 +23,7 @@ router.get("/attendance", auth, authRole("teacher"), studentCtrl.getAttendance);
 
 router.get("/attendance/:id", auth, authRole("teacher"), studentCtrl.getAttendanceForStudent);
 
-router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuestionnaireAnswer);
+// router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuestionnaireAnswer);
 
 router.put("/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
 

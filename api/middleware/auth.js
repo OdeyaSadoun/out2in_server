@@ -3,8 +3,7 @@ const { config } = require("../config/secret");
 
 exports.authRole = (roles) => {
   return (req, res, next) => {
-    
-    let token = req.cookies.access_token;
+    let token = req.header("x-api-key");
     try {
       let decodeToken = jwt.verify(token, config.tokenSecret);
       if (roles.indexOf(decodeToken.role) == -1) {
@@ -23,9 +22,6 @@ exports.authRole = (roles) => {
 };
 
 exports.auth = (req, res, next) => {
-  console.log("aaa")
-  console.log(req)
-
   let token = req.cookies.access_token;
   if (!token) {
     return res

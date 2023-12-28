@@ -57,9 +57,9 @@ exports.studentCtrl = {
     }
   },
   getStudentById: async (req, res) => {
-    if (!req.body.active && req.body.active != false) {
-      return res.status(400).json({ msg: "Need to send active in body" });
-    }
+    // if (!req.body.active && req.body.active != false) {
+    //   return res.status(400).json({ msg: "Need to send active in body" });
+    // }
     let student_id = req.params.id;
     try {
       let studentInfo = await StudentModel.findOne({
