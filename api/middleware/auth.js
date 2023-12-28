@@ -22,7 +22,7 @@ exports.authRole = (roles) => {
 };
 
 exports.auth = (req, res, next) => {
-  let token = req.cookies.access_token;
+  let token = req.header("x-api-key");
   if (!token) {
     return res
       .status(401)
