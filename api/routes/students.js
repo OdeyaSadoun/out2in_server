@@ -5,7 +5,7 @@ const { getUserInfo } = require("../middleware/user");
 
 const router = express.Router();
 
-router.get("/info", auth, authRole("student"), getUserInfo, studentCtrl.getStudentInfo);
+router.get("/myinfo", auth, authRole("student"), getUserInfo, studentCtrl.getStudentInfo);
 
 router.get("/studentsByTeacher", auth, authRole("teacher"), studentCtrl.getAllStudentsTeacher);
 

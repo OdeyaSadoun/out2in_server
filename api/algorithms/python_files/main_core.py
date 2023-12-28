@@ -1,7 +1,9 @@
+from matplotlib import pyplot as plt
 import numpy as np
 import csv
 import networkx as nx
-
+from collections import defaultdict
+import json
 
 # import matplotlib.pyplot as plt
 
@@ -10,15 +12,14 @@ def out_degree(g, node):
     return len(list(g.neighbors(node)))
 
 # print(list(g.neighbors('E')))
-def in_degree2(g, node):
+def in_degree(g, node):
     edges = list(g.edges)
     return sum([1 for edge in edges if edge[1] == node])
-
 
 def statistic(vertex, g):
     # 1:
     # global g
-    din = in_degree2(g, vertex)  # n-1
+    din = in_degree(g, vertex)  # n-1
     din = din / 5 * 100
 
     # 2:
@@ -39,58 +40,27 @@ def statistic(vertex, g):
     # ...
     return final
 
-
 def scanGraph(g):
     d = {}
     for node in list(g):
-        d[node] = (in_degree2(g, node), out_degree(g, node))
+        d[node] = (in_degree(g, node), out_degree(g, node))
         # print(node, in_degree2(g,node),out_degree(g,node))
     return d
 
+friends_list = [{"student": 1, "friends": [2,3,4]},{"student": 2, "friends": [5,3,4]},{"student": 5, "friends": [2,3,4]},{"student": 4, "friends": [2,5,1]}]
 
-g = nx.DiGraph()
+def make_directed_graph_for_connections_between_students(friends_list):
+    g = nx.DiGraph()
 
+    # הוספת הצמתים לגרף
+    for student in friends_list:
+        g.add_node(student["student"])
 
-def main(my_list=None):
-    if my_list is None:
-        with open('yyy.csv', newline='') as f:
-            reader = csv.reader(f)
-            my_list = [tuple(row) for row in reader]
-    #print(my_list)
-    my_array = np.array(my_list)
-    # printing my_array
-    # print (my_array)
-    # printing the type of my_array
-    for x in my_array:
-        g.add_edge(x[1], x[2])
-        g.add_edge(x[1], x[3])
-        g.add_edge(x[1], x[4])
-    # print("Direction graph:")
+    # הוספת הקשתות לגרף
+    for student in friends_list:
+        for friend in student["friends"]:
+            g.add_edge(student["student"], friend)
+
+    # הדפסת הגרף בתצוגה ויזואלית
     nx.draw(g, with_labels=True)
-    # plt.draw()
-    # plt.show()
-
-    d = {}
-    for node in list(g):
-        # print(out_degree(g,node))
-        d[node] = (in_degree2(g, node), out_degree(g, node))
-    # scan_array = [d]
-
-    dnew = {}
-    for key in d:
-        # print (key, 'corresponds to', d[key])
-        # for item in scan_array.:
-        #  print(key)
-        mark = statistic(key, g)
-        # dd(mark)
-        for node in list(g):
-            if node == key:
-                dnew[node] = mark
-        # d[key.index][3] = mark
-    # print("The index of analyzed data presented to the teacher:")
-    # print(dnew)
-    return dnew
-
-
-if __name__ == '__main__':
-    main()
+    plt.show()
