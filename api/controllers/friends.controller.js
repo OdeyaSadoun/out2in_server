@@ -1,5 +1,5 @@
 // const py = require("py");
-
+const { default: axios } = require("axios");
 const { callPythonFunction } = require("../helpers/python.helper");
 const { FriendModel } = require("../models/friends.model");
 
@@ -28,9 +28,8 @@ exports.friendCtrl = {
   },
   getFriendsList: async (req, res) => {
     try {
-      let data = await FriendModel.find({})
+      let data = await FriendModel.find({});
       res.json(data);
-
     } catch (error) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -39,17 +38,26 @@ exports.friendCtrl = {
   calcSocialIndexStudents: async (req, res) => {
     try {
       const { friends_list } = req.body;
-      const pyFunction = 'calc_social_index_students'; // Name of the Python function in social_index.py
-      const args = friends_list;
-      let url = "../api/algorithms/python_files/graph_funcs"
-      let file = "graph_funcs"
-      const result = await callPythonFunction(url,file,pyFunction, args);
-      console.log("Result from Python function:", result);
-  
-      res.status(200).json({ result }); // Sending the result back in the response
+      console.log("friends_list", friends_list);
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:5000/calculate_social_index",
+          { friends_list: friends_list },
+          {
+            headers: {
+              "Content-type": "application/json",
+            },
+          }
+        );
+
+        res.status(200).json(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
     }
-  }
+  },
 };

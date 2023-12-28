@@ -1,4 +1,6 @@
 const { exec } = require('child_process');
+const { spawn } = require("child_process");
+
 
 exports.runPythonCode = (code) => {
     return new Promise((resolve, reject) => {
@@ -32,22 +34,24 @@ exports.runPythonCode = (code) => {
     });
   };
   
-  exports.callPythonFunction = (url, file, functionName, args) => {
-    console.log("ho");
-    return new Promise((resolve, reject) => {
-      const formattedArgs = args.map(arg => JSON.stringify(arg)).join(', ');
-      const command = `python -c "import sys; sys.path.append('${url}'); from ${file} import ${functionName} ; print(${functionName}(${formattedArgs}));"`;
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        if (stderr) {
-          reject(stderr);
-          return;
-        }
-        resolve(stdout.trim());
-      });
+  exports.callPythonFunction = (pythonFile, functionName, args) => {
+
+    let argument = "True"; 
+    const pythonProcess = spawn('python3', 
+    ['-c', 
+    `import compliment; compliment.giveMe(${argument});`
+  ]); 
+    pythonProcess.stdout.on('data', (data) => { 
+      console.log(`stdout: ${data}`); 
+    }); 
+    pythonProcess.stderr.on('data', (data) => { 
+      console.log(`stderr: ${data}`); 
+    }); 
+    pythonProcess.on('exit', (code) => { 
+      console.log(`Python process ended with code: ${code}`); 
     });
+    
   };
+  
+  
   
