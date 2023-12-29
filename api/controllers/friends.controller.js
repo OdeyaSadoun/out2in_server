@@ -41,9 +41,7 @@ exports.friendCtrl = {
   },
   calcSocialIndexStudentsByQuestionnaire: async (req, res) => {
     try {
-      console.log(" req.body", req.body);
       const  friends_list  = req.body;
-      console.log("friends_list", friends_list);
       try {
         const response = await axios.post(
           "http://127.0.0.1:5000/calculate_social_index",
@@ -54,7 +52,6 @@ exports.friendCtrl = {
             },
           }
         );
-
         res.status(200).json(response.data);
       } catch (error) {
         console.error("Error:", error);
