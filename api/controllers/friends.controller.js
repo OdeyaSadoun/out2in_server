@@ -52,6 +52,8 @@ exports.friendCtrl = {
             },
           }
         );
+
+        console.log(response.data);
         res.status(200).json(response.data);
       } catch (error) {
         console.error("Error:", error);
