@@ -15,6 +15,16 @@ exports.userlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  getUserById: async (req, res) => {
+    try {
+      let id=req.params.id
+      let data = await UserModel.findOne({_id:id}, { password: 0 });
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
 getCurrentUser: async (req, res) => {
   let data = await UserModel.findOne({_id:req.tokenData._id}, { password: 0 });
   res.json(data);
