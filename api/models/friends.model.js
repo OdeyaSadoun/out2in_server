@@ -11,6 +11,14 @@ let friendSchema = new mongoose.Schema({
       ref: "users",
     },
   ],
+  date_created: {
+    type: Date,
+    default: Date.now(),
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 exports.FriendModel = mongoose.model("friends", friendSchema);

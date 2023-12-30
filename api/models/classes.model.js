@@ -2,28 +2,32 @@ const mongoose = require("mongoose");
 const { StudentModel } = require("./students.model");
 
 let classSchema = new mongoose.Schema({
-
-    school_id: {
+  school_id: {
+    type: mongoose.Schema.ObjectId,
+    ref: "schools",
+  },
+  name: String,
+  places: [
+    {
+      stud1: {
         type: mongoose.Schema.ObjectId,
-        ref: "schools",
+        ref: "students",
+      },
+      stud2: {
+        type: mongoose.Schema.ObjectId,
+        ref: "students",
+      },
     },
-    name: String,
-    places: [{
-       stud1: {
-            type: mongoose.Schema.ObjectId,
-            ref: "students",
-        },
-        stud2: {
-            type: mongoose.Schema.ObjectId,
-            ref: "students",
-        },
-    }],
-    active: Boolean,
-    date_created: {
-        type: Date,
-        default: Date.now(),
-    }
-});
+  ],
+  date_created: {
+    type: Date,
+    default: Date.now(),
+  },
 
+  active: {
+    type: Boolean,
+    default: true,
+  },
+});
 
 exports.ClassModel = mongoose.model("classes", classSchema);
