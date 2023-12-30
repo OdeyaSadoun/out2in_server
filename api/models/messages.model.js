@@ -17,7 +17,11 @@ let messageSchema = new mongoose.Schema({
       date_created: {
         type: Date,
         default: Date.now(),
-    }   
+      },
+      active:{
+        type:Boolean,
+        default:true
+      }
 });
 
 exports.MessageModel = mongoose.model("messages", messageSchema);
