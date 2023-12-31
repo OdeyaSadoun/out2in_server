@@ -10,7 +10,7 @@ router.get("/getClassBySchoolId/:id", auth, authRole(["admin","principal", "teac
 router.get("/students", auth, authRole(["admin","principal", "teacher","student"]), classCtrl.getAllStudentsInClass);
 router.get("/",classCtrl.getAllClasses);
 router.get("/places",auth, authRole(["admin","principal", "teacher"]), classCtrl.getAllPlaces);
-
+router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
 // router.get("/classes/distribution", classesCtrl.getClassAttendanceDistribution);
 // router.get("/classes/distribution/:id", classesCtrl.getAttendanceDistributionForStudent);
 // router.post("/classes/attendance", classesCtrl.fillClassAttendance);

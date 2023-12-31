@@ -51,6 +51,14 @@ exports.classCtrl = {
         }
     },
 
+    getClassesByTeacherId:async(req,res)=>{
+        console.log("enter")
+        let data =await TeacherModel.findOne({user_id:req.tokenData._id}).populate("classes_list")
+        // let data2 =await TeacherModel.find({})
+        console.log(data)
+        res.json(data.classes_list)
+      },
+
     getAllClasses: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 4;
         let page = req.query.page || 1;
