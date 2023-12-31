@@ -17,7 +17,7 @@ router.post("/places", auth, authRole(["admin","principal", "teacher"]),classCtr
 router.post("/",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClass);
 
 // router.put("/classes/attendance/:id", classesCtrl.updateAttendanceForStudent);
-router.put("/addTeacherClass",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
+router.put("/addTeacherClass/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
 router.put("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.updateClass);
 
 router.delete("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);

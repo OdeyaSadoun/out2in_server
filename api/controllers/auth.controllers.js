@@ -59,7 +59,7 @@ exports.authCtrl = {
         subject: `Hi ${user.name}, this is a message from out2in`,
         text: `To verify click here`
       }
-      sendEmail(toSend)
+      // sendEmail(toSend)
 
       res.status(201).json({ "details": user, "principal": principal });
     } catch (err) {
@@ -79,9 +79,11 @@ exports.authCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
+      
       let school = await SchoolsModel.findOne(
         { principal_id: req.tokenData._id }
       );
+      
       let objUser = { role: "teacher", ...req.body.user };
       let user = new UserModel(objUser);
 
@@ -93,7 +95,7 @@ exports.authCtrl = {
          email: ${user.email},
          password:${user.password}`
       }
-      sendEmail(toSend)
+      // sendEmail(toSend)
       user.password = await bcrypt.hash(user.password, 10);
       await user.save();
       user.password = "********";
@@ -132,7 +134,7 @@ exports.authCtrl = {
          email: ${user.email},
          password:${user.password}`
       }
-      sendEmail(toSend)
+      // sendEmail(toSend)
       user.password = await bcrypt.hash(user.password, 10);
       await user.save();
       user.password = "********";
