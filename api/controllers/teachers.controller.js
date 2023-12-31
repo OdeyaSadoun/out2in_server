@@ -2,6 +2,7 @@ const { TeacherModel } = require("../models/teachers.model");
 const { UserModel } = require("../models/users.model");
 const { SchoolsModel } = require("../models/schools.model");
 const bcrypt = require("bcrypt");
+const { StudentModel } = require("../models/students.model");
 
 
 
@@ -30,6 +31,19 @@ exports.teacherlCtrl = {
       else
         res.json(teacherByPrincipal);
 
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+  getAllTeachersByStudent: async (req, res) => {
+    try {
+      let student = await StudentModel.findOne(
+        { user_id: req.tokenData._id }
+      );
+      let data = await TeacherModel.find({}).populate("user_id", { "password": 0 });
+      let teachersByClass = data.filter(teacher => teacher.classes_list.includes(student.class_id))
+        res.json(teachersByClass);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
