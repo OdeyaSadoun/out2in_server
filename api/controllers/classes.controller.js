@@ -22,7 +22,7 @@ exports.classCtrl = {
     getClassesBySchoolId: async (req, res) => {
         const schoolId = req.params.id;
         try {
-            const data = await ClassModel.find({ school_id: schoolId });
+            const data = await ClassModel.find({ school_id: schoolId }).populate("subjects_list");
             if (!data) {
                 return res.status(404).json({ msg: "Class not found" });
             }
@@ -52,10 +52,10 @@ exports.classCtrl = {
     },
 
     getClassesByTeacherId:async(req,res)=>{
-        console.log("enter")
+    
         let data =await TeacherModel.findOne({user_id:req.tokenData._id}).populate("classes_list")
         // let data2 =await TeacherModel.find({})
-        console.log(data)
+      
         res.json(data.classes_list)
       },
 
