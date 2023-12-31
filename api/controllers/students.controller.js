@@ -37,6 +37,22 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  getAllStudentsByClassId: async (req, res) => {
+    let classId = req.params.classId;
+    try {
+      let data = await StudentModel.find({}).populate("user_id", {
+        password: 0,
+      });
+      let studentJson = data.filter((stud) => {
+        return stud.class_id == classId;
+      });
+      res.json(studentJson);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+
   getAllStudents: async (req, res) => {
     try {
       let data = await StudentModel.find({}).populate("user_id", {

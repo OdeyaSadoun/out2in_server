@@ -22,7 +22,6 @@ exports.subjectsCtrl = {
     }
   },
 
-
   getSubjectsByStudentId: async (req, res) => {
     try {
       let id = req.body.idCard;
@@ -54,20 +53,24 @@ exports.subjectsCtrl = {
     }
   },
 
-
-  getSubjectsById: async (req, res) => {
+  getSubjectsByClassId: async (req, res) => {
     try {
-      let subId = req.params.subId;
-      console.log(subId);
+      let classId = req.params.classId;
 
-      let subject = await SubjectsModel.findOne({ _id: subId });
-      console.log(subject);
+      let classObj = await ClassModel.findOne({ _id: classId });
 
-      res.json(subject);
+      let subjectsJson = await Promise.all(
+        classObj.subjects_list.map(async (sub) => {
+          const subData = await SubjectsModel.findOne({ _id: sub._id });
+          return subData;
+        })
+      );
+      res.json(subjectsJson);
     } catch (err) {
       res.json({ msg: err });
     }
   },
+
   addSubject: async (req, res) => {
     try {
       const newSub = new SubjectsModel({
@@ -102,4 +105,8 @@ exports.subjectsCtrl = {
       res.json(err);
     }
   },
+
+  showGrades: async(req, res) => {
+
+  }
 };

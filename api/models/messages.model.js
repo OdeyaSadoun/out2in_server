@@ -13,7 +13,6 @@ let messageSchema = new mongoose.Schema({
       title: String,
       value: String,
       read: Boolean,
-      active: Boolean,
       date_created: {
         type: Date,
         default: Date.now(),

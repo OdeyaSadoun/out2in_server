@@ -9,6 +9,8 @@ router.get("/myInfo", auth, authRole("student"), getUserInfo, studentCtrl.getStu
 
 router.get("/studentsByTeacher", auth, authRole("teacher"), studentCtrl.getAllStudentsTeacher);
 
+router.get("/studentsByClassId/:classId", auth, authRole(["principal", "teacher"]), studentCtrl.getAllStudentsByClassId);
+
 router.get("/allStudents", auth, authRole(["admin", "principal"]), studentCtrl.getAllStudents);
 
 router.get("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.getStudentById);
