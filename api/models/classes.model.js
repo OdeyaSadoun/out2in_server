@@ -23,7 +23,12 @@ let classSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-
+  subjects_list: [
+    {
+      type:mongoose.Schema.ObjectId,
+      ref:"subjects",
+    },
+  ],
   active: {
     type: Boolean,
     default: true,

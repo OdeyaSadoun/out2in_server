@@ -6,7 +6,13 @@ let subjectsSchema = new mongoose.Schema({
         ref: "users"
     },
     name: String,
-    marks_list: [{date:Date, mark:Number}],
+    tests_list: [
+        {
+          type:mongoose.Schema.ObjectId,
+          ref:"tests",
+        },
+      ],
+    // marks_list: [{date:Date, mark:Number}],
     
     active: {
         type: Boolean,

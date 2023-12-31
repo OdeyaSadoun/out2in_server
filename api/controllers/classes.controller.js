@@ -185,6 +185,7 @@ exports.classCtrl = {
     },
 
 
+    //need to check this function:
     deleteClass: async (req, res) => {
         try {
             const classId = req.params.id;

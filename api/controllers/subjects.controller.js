@@ -22,15 +22,56 @@ exports.subjectsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+    // getSubjectsByStudentId: async (req, res) => {
+    //     try { 
+    //         let id = req.body.idCard;
+    //         let user = await UserModel.findOne({ idCard: id })
+    //         if (!user) {
+    //             res.json({ "msg": "אין תלמיד עם תעודת זהות זו" })
+    //             return
+    //         }
+    //         let student = await StudentModel.findOne({ user_id: user._id })
+    //         let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id })
+
+    //         let classes = await ClassModel.find({});
+    //         let classesByTeacher = classes.filter(item => teacher.classes_list.includes(item._id))
+    //         let classesId = classesByTeacher.map(item => String(item._id))
+
+    //         if (!classesId.includes(String(student.class_id))) {
+    //             res.json({ "msg": "התלמיד לא שלך" })
+    //             return
+    //         }
+    //         let data = await SubjectsModel.find({})
+    //         let subjectByStudent = data.filter(sub => student.subjects_list.includes(sub._id))
+    //         res.json(subjectByStudent);
+
+    //     }
+    //     catch (err) {
+    //         res.json({ "msg": err})
+    //     }
+    // },
+    
     getSubjectsByStudentId: async (req, res) => {
         try { 
+
+            //find the student
+            //find the class
+            //over of subjects list
+            //in each subject - >
+            //over the students and filter / find one this student
+            //add the data to an array or list
+            //return it
+
+
             let id = req.body.idCard;
             let user = await UserModel.findOne({ idCard: id })
             if (!user) {
                 res.json({ "msg": "אין תלמיד עם תעודת זהות זו" })
                 return
             }
+
             let student = await StudentModel.findOne({ user_id: user._id })
+
             let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id })
 
             let classes = await ClassModel.find({});
@@ -50,6 +91,7 @@ exports.subjectsCtrl = {
             res.json({ "msg": err})
         }
     },
+    
     addSubject: async (req, res) => {
         try {
             const newSub = new SubjectsModel({
