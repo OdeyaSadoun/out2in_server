@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-let subjectsSchema = new mongoose.Schema({
+let testSchema = new mongoose.Schema({
   name: String,
   date: Date,
 
@@ -24,4 +24,4 @@ let subjectsSchema = new mongoose.Schema({
     default: Date.now(),
   },
 });
-exports.SubjectsModel = mongoose.model("subjects", subjectsSchema);
+exports.TestModel = mongoose.model("tests", testSchema);

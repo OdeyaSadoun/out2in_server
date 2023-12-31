@@ -21,6 +21,8 @@ exports.subjectsCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+
+
   getSubjectsByStudentId: async (req, res) => {
     try {
       let id = req.body.idCard;
@@ -52,12 +54,26 @@ exports.subjectsCtrl = {
     }
   },
 
+
+  getSubjectsById: async (req, res) => {
+    try {
+      let subId = req.params.subId;
+      console.log(subId);
+
+      let subject = await SubjectsModel.findOne({ _id: subId });
+      console.log(subject);
+
+      res.json(subject);
+    } catch (err) {
+      res.json({ msg: err });
+    }
+  },
   addSubject: async (req, res) => {
     try {
       const newSub = new SubjectsModel({
         teacher_id: req.tokenData._id,
         name: req.body.name,
-        marks_list: [],
+        tests_list: [],
       });
 
       await newSub.save();
@@ -68,6 +84,7 @@ exports.subjectsCtrl = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
   addGrade: async (req, res) => {
     let subId = req.params.subId;
     let grade = req.body.grade;
