@@ -2,6 +2,7 @@ const { classValidate } = require("../validations/classes.validation");
 const { ClassModel } = require("../models/classes.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
+const { TeacherModel } = require("../models/teachers.model");
 
 exports.classCtrl = {
 
@@ -103,21 +104,16 @@ exports.classCtrl = {
 
     addClass: async (req, res) => {
         try {
-            const { schoolId, name, places, active } = req.body;
-            const school = await SchoolsModel.findById(schoolId);
+            const { school_id, name, places } = req.body;
+            const school = await SchoolsModel.findById(school_id);
             if (!school) {
                 return res.status(404).json({ error: 'School not found' });
             }
-            const newClass = new ClassModel({
-                school_id: schoolId,
-                name,
-                places,
-                active,
-            });
+            const newClass = new ClassModel(req.body);
 
             await newClass.save();
 
-            res.status(201).json({ message: 'Class added successfully' });
+            res.status(201).json(newClass);
         } catch (error) {
             console.error('Error:', error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -132,7 +128,7 @@ exports.classCtrl = {
 
     addClassToTeacher: async (req, res) => {
         try {
-            const teacherId = req.params.teacherId;
+            const teacherId = req.params.id;
             const classId = req.body.classId;
             const teacher = await TeacherModel.findById(teacherId);
 
@@ -144,10 +140,13 @@ exports.classCtrl = {
                 return res.status(404).json({ error: 'Class not found' });
             }
 
-            teacher.classes.push(classToAdd);
-            await teacher.save();
+            let arr= teacher.classes_list;
+            arr.push(classId)
 
-            res.status(200).json({ message: 'Class added to the teacher successfully' });
+            let upTeacher1=await TeacherModel.updateOne({_id:teacherId}, { $set: { "classes_list": arr } })
+            res.status(200).json(upTeacher1);
+
+
         } catch (error) {
             console.error('Error:', error);
             res.status(500).json({ error: 'Internal Server Error' });
