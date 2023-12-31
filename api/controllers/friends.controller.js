@@ -1,6 +1,8 @@
 // const py = require("py");
 const { default: axios } = require("axios");
 const { FriendModel } = require("../models/friends.model");
+const { TeacherModel } = require("../models/teachers.model");
+const { StudentModel } = require("../models/students.model");
 
 exports.friendCtrl = {
   addNewQuestionnaireAnswer: async (req, res) => {
@@ -32,13 +34,41 @@ exports.friendCtrl = {
   },
   getFriendsList: async (req, res) => {
     try {
+      let data1 = await StudentModel.find({});
+      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
+      let friendsJson = data1.filter((stud) => {
+               return teacher.classes_list.includes(stud.class_id);
+            });
+      let friendsJsonID=friendsJson.map(f=> String(f.user_id))
       let data = await FriendModel.find({});
-      res.json(data);
+      let friendsByTeacher=data.filter((fr)=>{
+        return friendsJsonID.includes(String(fr.student))
+      })
+      res.json(friendsByTeacher);
     } catch (error) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
+  // getAllStudentsTeacher: async (req, res) => {
+  //   try {
+  //     let data = await StudentModel.find({}).populate("user_id", {
+  //       password: 0,
+  //     });
+  //     // console.log(req.tokenData._id);
+  //     let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
+
+  //     // console.log(teacher);
+  //     let studentJson = data.filter((stud) => {
+  //       return teacher.classes_list.includes(stud.class_id);
+  //     });
+  //     // console.log(studentJson);
+  //     res.json(studentJson);
+  //   } catch (err) {
+  //     console.log(err);
+  //     res.status(500).json({ msg: "err", err });
+  //   }
+  // },
   calcSocialIndexStudentsByQuestionnaire: async (req, res) => {
     try {
       const  friends_list  = req.body;
