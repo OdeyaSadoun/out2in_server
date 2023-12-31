@@ -6,25 +6,15 @@ const { UserModel } = require("../models/users.model");
 const { TestModel } = require("../models/tests.model");
 
 exports.testsCtrl = {
-  addGrade: async (req, res) => {
-    let testId = req.params.testId;
-    let studentId = req.body.studentId;
-    let grade = req.body.grade;
+  addTest: async (req, res) => {},
+  addGrades: async (req, res) => {
 
     try {
-      let test = await TestModel.findOne({ _id: testId });
-      let studensGrades = test.grades_list.push({
-        student_id: studentId,
-        grade
-      })
-
-      let data = await TestModel.updateOne(
-        { _id: testId },
-        { $set: { grades_list: studensGrades } }
-      );
-      res.json(data);
+      let newTest = new TestModel(req.body);
+      await newTest.save();
+      res.status(201).json(newTest);
     } catch (err) {
-      res.json(err);
+      res.status(500).json({ msg: "err", err });
     }
   },
 };
