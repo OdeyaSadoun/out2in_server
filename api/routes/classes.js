@@ -6,6 +6,7 @@ const { auth, authRole } = require("../middleware/auth");
 
 
 router.get("/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassById);
+router.get("/getClassBySchoolId/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassesBySchoolId);
 router.get("/students", auth, authRole(["admin","principal", "teacher","student"]), classCtrl.getAllStudentsInClass);
 router.get("/",classCtrl.getAllClasses);
 router.get("/places",auth, authRole(["admin","principal", "teacher"]), classCtrl.getAllPlaces);

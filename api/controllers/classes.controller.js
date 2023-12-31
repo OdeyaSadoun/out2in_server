@@ -9,7 +9,20 @@ exports.classCtrl = {
     getClassById: async (req, res) => {
         const classId = req.params.id;
         try {
-            const data = await ClassModel.findOne({ school_id: classId }, { password: 0 });
+            const data = await ClassModel.findOne({ _id: classId }).populate("subjects_list");
+            if (!data) {
+                return res.status(404).json({ msg: "Class not found" });
+            }
+            res.json(data);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ msg: "Internal server error", err });
+        }
+    },
+    getClassesBySchoolId: async (req, res) => {
+        const schoolId = req.params.id;
+        try {
+            const data = await ClassModel.find({ school_id: schoolId });
             if (!data) {
                 return res.status(404).json({ msg: "Class not found" });
             }
