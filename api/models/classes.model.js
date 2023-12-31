@@ -19,6 +19,18 @@ let classSchema = new mongoose.Schema({
       },
     },
   ],
+  attendance_list:[{
+    date:Date,
+    students_attendance:[
+      {
+        present:Boolean,
+        student_id:{
+          type: mongoose.Schema.ObjectId,
+          ref: "students",
+        }
+      }
+    ]
+  }],
   date_created: {
     type: Date,
     default: Date.now(),
