@@ -5,6 +5,7 @@ const { auth, authRole } = require('../middleware/auth');
 
 router.get('/',auth,authRole(["admin"]),subjectsCtrl.getAllSubjects);
 router.get('/getSubjecstByStudent/',auth,authRole(["teacher"]),subjectsCtrl.getSubjectsByStudentId);
+router.get('/getSubjecstById/:subId',auth,authRole(["principal", "teacher"]),subjectsCtrl.getSubjectsById);
 router.post ('/',auth, authRole(["teacher"]),subjectsCtrl.addSubject); // add subject to subjects array
 router.patch ('/addGrade/:subId',auth,authRole(["teacher"]),subjectsCtrl.addGrade);//grade send in body
 
