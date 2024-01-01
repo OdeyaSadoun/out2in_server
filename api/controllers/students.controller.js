@@ -40,13 +40,13 @@ exports.studentCtrl = {
   getAllStudentsByClassId: async (req, res) => {
     let classId = req.params.classId;
     try {
-      let data = await StudentModel.find({}).populate("user_id", {
+      let students = await StudentModel.find({class_id:classId}).populate("user_id", {
         password: 0,
       });
-      let studentJson = data.filter((stud) => {
-        return stud.class_id == classId;
-      });
-      res.json(studentJson);
+      // let studentJson = data.filter((stud) => {
+      //   return stud.class_id == classId;
+      // });
+      res.json(students);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
