@@ -11,7 +11,7 @@ exports.teacherlCtrl = {
     try {
       let teacherInfo = await TeacherModel.findOne(
         { user_id: req.tokenData._id  }
-      );
+      ).populate("schools_list");
       res.json({ "user": req.userInfo, "other": teacherInfo });
     } catch (err) {
       console.log(err);
@@ -24,7 +24,7 @@ exports.teacherlCtrl = {
         { principal_id: req.tokenData._id }
       );
       let data = await TeacherModel.find({}).populate("user_id", { "password": 0 });
-      let teacherByPrincipal = data.filter(teach => teach.schools_list.includes(school._id))
+      let teacherByPrincipal = data.filter(teach => teach.schools_list.includes(school._id)&&teach.user_id.active==true)
       if (req.tokenData.role == "admin") {
         res.json(data);
       }
