@@ -38,13 +38,13 @@ exports.classCtrl = {
   },
 
   getAllStudentsInClass: async (req, res) => {
-    let id=req.params.id;
+    let classId=req.params.classId;
     let perPage = Math.min(req.query.perPage, 20) || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await StudentModel.find({ class_id:id })
+      let data = await StudentModel.find({ class_id:classId })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse }).populate("user_id");
