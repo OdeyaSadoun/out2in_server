@@ -9,7 +9,20 @@ exports.classCtrl = {
     getClassById: async (req, res) => {
         const classId = req.params.id;
         try {
-            const data = await ClassModel.findOne({ school_id: classId }, { password: 0 });
+            const data = await ClassModel.findOne({ _id: classId }).populate("subjects_list");
+            if (!data) {
+                return res.status(404).json({ msg: "Class not found" });
+            }
+            res.json(data);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ msg: "Internal server error", err });
+        }
+    },
+    getClassesBySchoolId: async (req, res) => {
+        const schoolId = req.params.id;
+        try {
+            const data = await ClassModel.find({ school_id: schoolId }).populate("subjects_list");
             if (!data) {
                 return res.status(404).json({ msg: "Class not found" });
             }
@@ -37,6 +50,14 @@ exports.classCtrl = {
             res.status(500).json({ msg: "Internal Server Error", err });
         }
     },
+
+    getClassesByTeacherId:async(req,res)=>{
+    
+        let data =await TeacherModel.findOne({user_id:req.tokenData._id}).populate("classes_list")
+        // let data2 =await TeacherModel.find({})
+      
+        res.json(data.classes_list)
+      },
 
     getAllClasses: async (req, res) => {
         let perPage = Math.min(req.query.perPage, 20) || 4;

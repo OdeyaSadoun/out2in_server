@@ -23,20 +23,36 @@ exports.studentCtrl = {
       let data = await StudentModel.find({}).populate("user_id", {
         password: 0,
       });
-      console.log(req.tokenData._id);
+      // console.log(req.tokenData._id);
       let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
 
-      console.log(teacher);
+      // console.log(teacher);
       let studentJson = data.filter((stud) => {
         return teacher.classes_list.includes(stud.class_id);
       });
-      console.log(studentJson);
+      // console.log(studentJson);
       res.json(studentJson);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
+  getAllStudentsByClassId: async (req, res) => {
+    let classId = req.params.classId;
+    try {
+      let data = await StudentModel.find({}).populate("user_id", {
+        password: 0,
+      });
+      let studentJson = data.filter((stud) => {
+        return stud.class_id == classId;
+      });
+      res.json(studentJson);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+
   getAllStudents: async (req, res) => {
     try {
       let data = await StudentModel.find({}).populate("user_id", {

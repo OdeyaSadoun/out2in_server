@@ -16,7 +16,6 @@ let studentSchema = new mongoose.Schema({
       type:mongoose.Schema.ObjectId,
       ref:"schools",
     },
-    class_attendance:  [{date: Date, attendance: Boolean}],
     subjects_list:[
         {
             type:mongoose.Schema.ObjectId,
