@@ -2,7 +2,7 @@ const { MessageModel } = require("../models/messages.model");
 const { messageValidate } = require("../validations/messages.validation");
 
 exports.messagesCtrl = {
-    getMessagesByUserId: async (req, res) => {
+    getMessagesByUserId: async (req, res) => { //????this function not do the correct thing
         try {
             const userId = req.params.userId;
             let data = await SchoolsModel.find({ userId: userId });
@@ -12,6 +12,7 @@ exports.messagesCtrl = {
             res.status(500).json({ msg: "Error", error: err.message });
         }
     },
+
     sendMessageToTeacher: async (req, res) => {
         try {
             const studentId = req.params.studentId;
@@ -35,7 +36,6 @@ exports.messagesCtrl = {
             res.status(500).json({ msg: "Error", error: err.message });
         }
     },
-
 
     sendMessagesToAll: async (req, res) => {
         try {

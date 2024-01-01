@@ -1,17 +1,16 @@
 const mongoose = require("mongoose");
 
 let testSchema = new mongoose.Schema({
-  name: String,
-  date: Date,
 
+  date: Date,
   grades_list: [
     {
       grade: Number,
       student: {
-        type:mongoose.Schema.ObjectId,
-        ref:"students",
+        type: mongoose.Schema.ObjectId,
+        ref: "students",
       },
-    //   avg: Number
+      //   avg: Number
     },
   ],
 
