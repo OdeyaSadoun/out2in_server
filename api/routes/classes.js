@@ -7,7 +7,7 @@ const { auth, authRole } = require("../middleware/auth");
 router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
 router.get("/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassById);
 router.get("/getClassBySchoolId/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassesBySchoolId);
-router.get("/students", auth, authRole(["admin","principal", "teacher","student"]), classCtrl.getAllStudentsInClass);
+router.get("/students/:id", auth, authRole(["admin","principal", "teacher","student"]), classCtrl.getAllStudentsInClass);
 router.get("/",classCtrl.getAllClasses);
 router.get("/places",auth, authRole(["admin","principal", "teacher"]), classCtrl.getAllPlaces);
 // router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
@@ -18,7 +18,7 @@ router.post("/places", auth, authRole(["admin","principal", "teacher"]),classCtr
 router.post("/",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClass);
 
 // router.put("/classes/attendance/:id", classesCtrl.updateAttendanceForStudent);
-router.put("/addTeacherClass/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
+router.put("/addTeacherClass/:classId",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
 router.put("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.updateClass);
 
 router.delete("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);
