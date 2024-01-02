@@ -7,6 +7,7 @@ const classesR = require("./classes");
 const messagesR = require("./messages");
 const subjectsR = require("./subjects");
 const friendsR = require("./friends");
+const testsR = require("./tests");
 
 
 exports.routesInit = (app) => {
@@ -19,4 +20,5 @@ exports.routesInit = (app) => {
   app.use("/messages", messagesR);
   app.use("/subjects", subjectsR);
   app.use("/friends", friendsR);
+  app.use("/tests", testsR);
 };

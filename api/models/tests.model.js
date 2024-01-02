@@ -6,7 +6,7 @@ let testSchema = new mongoose.Schema({
   grades_list: [
     {
       grade: Number,
-      student: {
+      student_id: {
         type: mongoose.Schema.ObjectId,
         ref: "students",
       },
