@@ -38,15 +38,16 @@ exports.classCtrl = {
   },
 
   getAllStudentsInClass: async (req, res) => {
+    let classId=req.params.classId;
     let perPage = Math.min(req.query.perPage, 20) || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await ClassModel.find({ user_id: req.tokenData._id })
+      let data = await StudentModel.find({ class_id:classId })
         .limit(perPage)
         .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
+        .sort({ [sort]: reverse }).populate("user_id");
       res.json(data);
     } catch (err) {
       console.error(err);
@@ -212,4 +213,46 @@ exports.classCtrl = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+  
+  updateAttendance: async (req, res) => {
+    try {
+      const { classId, date, studentsAttendance } = req.body;
+
+      const classToUpdate = await ClassModel.findById(classId);
+
+      if (!classToUpdate) {
+        return res.status(404).json({ error: 'Class not found' });
+      }
+
+      // Find the attendance entry for the specified date
+      const attendanceEntry = classToUpdate.attendance_list.find(entry => entry.date.toISOString() === date);
+
+      if (!attendanceEntry) {
+        return res.status(404).json({ error: 'Attendance entry not found for the specified date' });
+      }
+
+      // Update the students' attendance in the found entry
+      studentsAttendance.forEach(student => {
+        const existingStudentAttendance = attendanceEntry.students_attendance.find(sa => sa.student_id.toString() === student.student_id.toString());
+
+        if (existingStudentAttendance) {
+          existingStudentAttendance.present = student.present;
+        } else {
+          // If the student is not found in the entry, add a new entry
+          attendanceEntry.students_attendance.push({
+            present: student.present,
+            student_id: student.student_id,
+          });
+        }
+      });
+
+      await classToUpdate.save();
+
+      res.status(200).json({ message: 'Attendance updated successfully' });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
 };
