@@ -4,23 +4,15 @@ const router = express.Router();
 const { classCtrl } = require("../controllers/classes.controller");
 const { auth, authRole } = require("../middleware/auth");
 
-router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
-router.get("/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassById);
-router.get("/getClassBySchoolId/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassesBySchoolId);
-router.get("/students/:classId", auth, authRole(["admin","principal", "teacher","student"]), classCtrl.getAllStudentsInClass);
 router.get("/",classCtrl.getAllClasses);
+router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
+router.get("/getClassBySchoolId/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassesBySchoolId);
 router.get("/places",auth, authRole(["admin","principal", "teacher"]), classCtrl.getAllPlaces);
-// router.get("/getClassesByTeacherId",auth, authRole('teacher'), classCtrl.getClassesByTeacherId);
-// router.get("/classes/distribution", classesCtrl.getClassAttendanceDistribution);
-// router.get("/classes/distribution/:id", classesCtrl.getAttendanceDistributionForStudent);
-// router.post("/classes/attendance", classesCtrl.fillClassAttendance);
+router.get("/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassById);
 router.post("/places", auth, authRole(["admin","principal", "teacher"]),classCtrl.addPlacesToClass);
 router.post("/",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClass);
-
-// router.put("/classes/attendance/:id", classesCtrl.updateAttendanceForStudent);
 router.put("/addTeacherClass/:classId",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
 router.put("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.updateClass);
-
 router.delete("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);
 
 module.exports = router;

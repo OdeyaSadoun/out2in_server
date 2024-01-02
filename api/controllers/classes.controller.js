@@ -37,30 +37,11 @@ exports.classCtrl = {
     }
   },
 
-  getAllStudentsInClass: async (req, res) => {
-    let classId=req.params.classId;
-    let perPage = Math.min(req.query.perPage, 20) || 4;
-    let page = req.query.page || 1;
-    let sort = req.query.sort || "_id";
-    let reverse = req.query.reverse == "yes" ? -1 : 1;
-    try {
-      let data = await StudentModel.find({ class_id:classId })
-        .limit(perPage)
-        .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse }).populate("user_id");
-      res.json(data);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ msg: "Internal Server Error", err });
-    }
-  },
-
   getClassesByTeacherId: async (req, res) => {
     let data = await TeacherModel.findOne({
       user_id: req.tokenData._id,
     }).populate("classes_list");
-    // let data2 =await TeacherModel.find({})
-
+    
     res.json(data.classes_list);
   },
 
