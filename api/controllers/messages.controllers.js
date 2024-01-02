@@ -1,11 +1,12 @@
 const { MessageModel } = require("../models/messages.model");
+const { UserModel } = require("../models/users.model");
 const { messageValidate } = require("../validations/messages.validation");
 
 exports.messagesCtrl = {
-    getMessagesByUserId: async (req, res) => { //????this function not do the correct thing
+    getMessagesByUserId: async (req, res) => {
         try {
-            const userId = req.params.userId;
-            let data = await SchoolsModel.find({ userId: userId });
+            const teacherId = req.params.teacherId;
+            let data = await MessageModel.find({ teacher_id: teacherId }).populate("student_id")
             res.json(data);
         } catch (err) {
             console.log(err);
@@ -17,11 +18,11 @@ exports.messagesCtrl = {
         try {
             const studentId = req.params.studentId;
 
-            const { teacherId, title, value } = req.body;
+            const { teacher_id, title, value } = req.body;
 
             const newMessage = new MessageModel({
                 student_id: studentId,
-                teacher_id: teacherId,
+                teacher_id: teacher_id,
                 title: title,
                 value: value,
                 read: false,

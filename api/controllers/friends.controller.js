@@ -38,7 +38,7 @@ exports.friendCtrl = {
       if (friendsList.length > 0) {
         newAnswer = new FriendModel({
           student: student,
-          friends: friendsList,
+          friends_list: friendsList,
         });
       }
 

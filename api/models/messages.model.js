@@ -4,7 +4,7 @@ let messageSchema = new mongoose.Schema({
    
       student_id: {
         type:mongoose.Schema.ObjectId,
-        ref:"students",
+        ref:"users",
       },
       teacher_id:{
         type:mongoose.Schema.ObjectId,
@@ -12,7 +12,10 @@ let messageSchema = new mongoose.Schema({
       },
       title: String,
       value: String,
-      read: Boolean,
+      read :{
+        type:Boolean,
+        default:false
+      },
       date_created: {
         type: Date,
         default: Date.now(),
