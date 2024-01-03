@@ -86,5 +86,25 @@ exports.messagesCtrl = {
             console.error(err);
             res.status(500).json({ msg: "Error", error: err.message });
         }
+    },
+
+    readMessage: async (req, res) => {
+        try {
+            const messageId = req.params.messageId;
+            const message = await MessageModel.findById(messageId);
+
+            if (!message) {
+                return res.status(404).json({ msg: "Message not found" });
+            }
+
+            message.read = true;
+
+            await message.save();
+
+            res.json({ msg: "The message has been marked as successfully read" });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ msg: "Error", error: err.message });
+        }
     }
 }
