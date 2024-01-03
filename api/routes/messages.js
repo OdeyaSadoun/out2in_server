@@ -10,7 +10,9 @@ router.post("/:studentId",auth,authRole(["admin","student"]),messagesCtrl.sendMe
 
 router.post("/",auth,authRole(["admin","student","teacher","principal"]),messagesCtrl.sendMessagesToAll);
 
-router.put("/:id",auth,authRole(["admin"]),messagesCtrl.deleteMessage);
+router.patch("/deactiveMessage/:messageId",auth,authRole(["admin","teacher"]),messagesCtrl.deleteMessage);
+
+router.patch("/readMessage/:messageId",auth,authRole(["admin","teacher"]),messagesCtrl.readMessage);
 
 
 module.exports = router;

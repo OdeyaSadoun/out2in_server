@@ -15,13 +15,12 @@ let studentSchema = new mongoose.Schema({
     {
       type:mongoose.Schema.ObjectId,
       ref:"schools",
-    },
-    subjects_list:[
-        {
-            type:mongoose.Schema.ObjectId,
-            ref:"subjects",
-          }
-    ]
+    }
+  ,
+  social_index:{
+    type:Number,
+    default:0
+  }
   
 });
 
