@@ -16,6 +16,7 @@ exports.userlCtrl = {
     }
   },
   getUserById: async (req, res) => {
+    console.log("user by id");
     try {
       let id=req.params.id
       let data = await UserModel.findOne({_id:id}, { password: 0 });
