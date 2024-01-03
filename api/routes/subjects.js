@@ -9,7 +9,9 @@ router.get('/getSubjecstByStudent/',auth,authRole(["teacher"]),subjectsCtrl.getS
 router.get('/getSubjectsByClassId/:classId',auth,authRole(["principal", "teacher"]),subjectsCtrl.getSubjectsByClassId);
 router.post ('/',auth, authRole(["teacher"]),subjectsCtrl.addSubject); // add subject to subjects array
 router.post ('/addGrades',auth,authRole(["teacher"]),testsCtrl.addGrades);//grade send in body
+router.post ('/addSubject',auth,authRole(["teacher"]),subjectsCtrl.addSubject);//grade send in body
 router.patch ('/addTestToSubject/:subId',auth,authRole(["teacher"]),testsCtrl.addTestToSubject);//grade send in body
+router.patch ('/addSubjectToClass/:classId',auth,authRole(["teacher"]),subjectsCtrl.addSubjectToClass);//grade send in body
 
 module.exports=router;
 
