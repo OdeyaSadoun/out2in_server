@@ -11,8 +11,9 @@ router.get("/places",auth, authRole(["admin","principal", "teacher"]), classCtrl
 router.get("/:id", auth, authRole(["admin","principal", "teacher"]), classCtrl.getClassById);
 router.post("/places", auth, authRole(["admin","principal", "teacher"]),classCtrl.addPlacesToClass);
 router.post("/",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClass);
+router.post("/addAttendance/:classId",auth, authRole(["admin","principal", "teacher"]), classCtrl.AddAttendance);
 router.put("/addTeacherClass/:classId",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClassToTeacher);
 router.put("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.updateClass);
-router.delete("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);
+router.put("/delete/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);
 
 module.exports = router;
