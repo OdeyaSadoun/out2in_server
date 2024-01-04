@@ -50,10 +50,9 @@ exports.teacherlCtrl = {
     }
   },
   getClasses:async(req,res)=>{
-    console.log("enter")
+
     let data =await TeacherModel.findOne({user_id:req.tokenData._id}).populate("classes_list")
     // let data2 =await TeacherModel.find({})
-    console.log(data)
     res.json(data.classes_list)
   },
   addSchool:async(req,res)=>{

@@ -9,9 +9,9 @@ exports.testsCtrl = {
   addTestToSubject: async (req, res) => {
     const subId = req.params.subId;
     const testId = req.body.test_id;
-    console.log("hi", subId, testId);
+ 
     let subject = await SubjectsModel.findOne({ _id: subId });
-    console.log(subject.tests_list);
+
     
     let data = await SubjectsModel.updateOne(
       { _id: subId },
