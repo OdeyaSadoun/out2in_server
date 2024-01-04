@@ -16,6 +16,10 @@ let messageSchema = new mongoose.Schema({
         type:Boolean,
         default:false
       },
+      important :{
+        type:Boolean,
+        default:false
+      },
       date_created: {
         type: Date,
         default: Date.now(),
