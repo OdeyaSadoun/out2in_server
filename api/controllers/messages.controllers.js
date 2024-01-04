@@ -61,10 +61,12 @@ exports.messagesCtrl = {
   getMessagesByUserId: async (req, res) => {
     try {
       const teacherId = req.params.teacherId;
-      let data = await MessageModel.find({ teacher_id: teacherId }).populate(
-        "student_id"
-      );
-      res.json(data);
+      let messages = await MessageModel.find({
+        teacher_id: teacherId,
+      }).populate("student_id");
+      let messagesActive = messages.filter((m) => m.active == true);
+
+      res.json(messagesActive);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "Error", error: err.message });
@@ -122,14 +124,13 @@ exports.messagesCtrl = {
 
   deleteMessage: async (req, res) => {
     try {
-      const messageId = req.params.messageId;
+      const { messageId } = req.params;
       const message = await MessageModel.findById(messageId);
-
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
 
-      const authenticatedUserId = req.user.id;
+      const authenticatedUserId = req.tokenData._id;
       if (
         message.student_id.toString() !== authenticatedUserId &&
         message.teacher_id.toString() !== authenticatedUserId
@@ -139,11 +140,12 @@ exports.messagesCtrl = {
           .json({ msg: "You do not have permission to delete this message" });
       }
 
-      message.active = false;
+      let data = await MessageModel.updateOne(
+        { _id: messageId },
+        { $set: { active: false } }
+      );
 
-      await message.save();
-
-      res.json({ msg: "Message marked as inactive successfully" });
+      res.json(message);
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Error", error: err.message });
@@ -171,6 +173,7 @@ exports.messagesCtrl = {
       res.status(500).json({ msg: "Error", error: err.message });
     }
   },
+
   checkMessage: async (req, res) => {
     try {
       const { messageId } = req.params;
@@ -196,6 +199,7 @@ exports.messagesCtrl = {
       res.status(500).json({ msg: "Error", error: err.message });
     }
   },
+
   updateImportantInMessage: async (req, res) => {
     try {
       const { messageId } = req.params;

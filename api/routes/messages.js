@@ -26,7 +26,7 @@ router.post(
 );
 
 router.patch(
-  "/deactiveMessage/:messageId",
+  "/deleteMessage/:messageId",
   auth,
   authRole(["admin", "teacher"]),
   messagesCtrl.deleteMessage
