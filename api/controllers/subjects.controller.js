@@ -34,13 +34,13 @@ exports.subjectsCtrl = {
       let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
 
       let classes = await ClassModel.find({});
-      let classesByTeacher = classes.filter((item) =>
-        teacher.classes_list.includes(item._id)
+      let classesByTeacher = classes.filter((teacher) =>
+        teacher.classes_list.includes(teacher._id)
       );
       let classesId = classesByTeacher.map((item) => String(item._id));
 
       if (!classesId.includes(String(student.class_id))) {
-        res.json({ msg: "התלמיד לא שלך" });
+        res.json({ msg: "התלמיד אינו שלך" });
         return;
       }
       let data = await SubjectsModel.find({});
@@ -88,25 +88,16 @@ exports.subjectsCtrl = {
     }
   },
 
-  addGrade: async (req, res) => {
-    let subId = req.params.subId;
-    let grade = req.body.grade;
-    try {
-      let subject = await SubjectsModel.findOne({ _id: subId });
-      let arr = subject.marks_list;
-      arr.push(grade);
+  addSubjectToClass: async (req, res) => {
+    const classId = req.params.classId;
+    const subjectId = req.body.subject_id;
+    let cls = await ClassModel.findOne({ _id: classId });
+    console.log(cls.subjects_list);
 
-      let data = await SubjectsModel.updateOne(
-        { _id: subId },
-        { $set: { marks_list: arr } }
-      );
-      res.json(data);
-    } catch (err) {
-      res.json(err);
-    }
+    let data = await ClassModel.updateOne(
+      { _id: classId },
+      { $push: { subjects_list: subjectId } }
+    );
+    console.log(data);
   },
-
-  showGrades: async(req, res) => {
-
-  }
 };

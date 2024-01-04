@@ -12,7 +12,6 @@ let subjectsSchema = new mongoose.Schema({
           ref:"tests",
         },
       ],
-    // marks_list: [{date:Date, mark:Number}],
     
     active: {
         type: Boolean,
@@ -23,4 +22,5 @@ let subjectsSchema = new mongoose.Schema({
         default: Date.now()
     }
 });
+
 exports.SubjectsModel = mongoose.model("subjects", subjectsSchema);
