@@ -40,7 +40,6 @@ exports.subjectsCtrl = {
 
       let filterData = data.filter((sub) => sub.active);
       let activeTests = filterData.tests_list.filter((test) => test.active);
-      console.log("**********************activeTests", activeTests);
       filterData.tests_list = activeTests;
 
       res.json(filterData);

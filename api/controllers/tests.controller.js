@@ -3,9 +3,9 @@ const { TestModel } = require("../models/tests.model");
 
 exports.testsCtrl = {
   getTestById: async (req, res) => {
-    let id = req.params.id;
+    let {testId} = req.params;
     try {
-      let data = await TestModel.findOne({ _id: id });
+      let data = await TestModel.findOne({ _id: testId });
       res.json(data);
     } catch (err) {
       console.log(err);
@@ -36,7 +36,7 @@ exports.testsCtrl = {
 
   GetTestsBalanceByStudentId: async (req, res) => {
     let gradesSum = 0;
-    const studentId = req.params.studentId;
+    const {studentId} = req.params;
     let student_class;
     try {
       const student = await StudentModel.findOne({
