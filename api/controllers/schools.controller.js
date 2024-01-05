@@ -19,6 +19,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+
     getSchoolById: async (req, res) => {
         let id = req.params.id;
         try {
@@ -29,6 +30,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+
     getSchoolByPricipalId: async (req, res) => {
         let id = req.tokenData._id;
         try {
@@ -39,6 +41,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+
     getAllClassesInSchool: async (req, res) => {
         let school_id = req.params.id;
         try {
@@ -49,6 +52,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+
     addSchool: async (req, res) => {
         let valdiateBody = schoolsValidate(req.body);
         if (valdiateBody.error) {
@@ -66,6 +70,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err })
         }
     },
+
     updateSchool: async (req, res) => {
         let valdiateBody = schoolsValidate(req.body);
         if (valdiateBody.error) {
@@ -87,6 +92,7 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err })
         }
     },
+    
     deleteSchool: async (req, res) => {
         if (!req.body.active && req.body.active != false) {
             return res.status(400).json({ msg: "Need to send active in body" });
