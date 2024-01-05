@@ -34,6 +34,37 @@ exports.testsCtrl = {
     }
   },
 
+  GetTestsBalanceByStudentId: async (req, res) => {
+    let gradesSum = 0;
+    const studentId = req.params.studentId;
+    let student_class;
+    try {
+      const student = await StudentModel.findOne({
+        _id: studentId,
+      }).populate("user_id", { password: 0 });
+
+      student_class = await ClassModel.findOne({ _id: student.class_id })
+        .populate("subjects_list");
+
+      const subjects_list = student_class.subjects_list;
+      await subjects_list.map(async (subject, i) => {
+        let last_test_id = subject.tests_list.slice(-1);
+        const last_test = await TestModel.findOne({ _id: last_test_id })
+        const student_grade = last_test.grades_list.filter((grade) => {
+          return String(grade.student_id) === String(studentId)
+        });
+        gradesSum += Number(student_grade[0].grade);
+        if (i == 0) {
+          console.log(gradesSum);
+          res.json({ "gradesAvg": gradesSum/subjects_list.length })
+        }
+      })
+    }
+    catch (err) {
+      console.log({ msg: "err", err });
+    }
+  },
+  
   addTestToSubject: async (req, res) => {
     const subId = req.params.subId;
     const testId = req.body.test_id;

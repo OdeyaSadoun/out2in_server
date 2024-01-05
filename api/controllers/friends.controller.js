@@ -8,11 +8,11 @@ exports.friendCtrl = {
   getFriendsList: async (req, res) => {
     try {
       let classId=req.params.classId;
-      console.log(classId)
+     
       let student = await StudentModel.find({class_id:classId}); 
-      console.log(student)  
+ 
       let friendsJsonID = student.map((f) => String(f.user_id));
-      console.log(friendsJsonID)
+
       let data = await FriendModel.find({});
       let friendsByClass = data.filter((fr) => {
         return friendsJsonID.includes(String(fr.student));

@@ -200,38 +200,23 @@ exports.classCtrl = {
     updateAttendance: async (req, res) => {
         try {
             const { classId, date, studentsAttendance } = req.body;
-
             const classToUpdate = await ClassModel.findById(classId);
-
             if (!classToUpdate) {
                 return res.status(404).json({ error: 'Class not found' });
             }
-
             // Find the attendance entry for the specified date
-
-
             const attendanceEntry = classToUpdate.attendance_list.filter(entry => {
-                return Date(entry.date) == Date(date)
+                let d1 = new Date(date)
+                let d2 = new Date(entry.date)
+                return d1.toString() == d2.toString()
             });
 
             if (attendanceEntry.length < 1) {
                 return res.status(404).json({ error: 'Attendance entry not found for the specified date' });
             }
-
-            // Update the students' attendance in the found entry
-            studentsAttendance.forEach(student => {
-                const existingStudentAttendance = attendanceEntry[0].students_attendance.find(sa => sa.student_id.toString() === student.student_id.toString());
-
-                if (existingStudentAttendance) {
-                    existingStudentAttendance.present = student.present;
-                } else {
-                    // If the student is not found in the entry, add a new entry
-                    attendanceEntry.students_attendance.push({
-                        present: student.present,
-                        student_id: student.student_id,
-                    });
-                }
-            });
+            // console.log(attendanceEntry)
+            attendanceEntry[0].students_attendance = studentsAttendance
+            // console.log(attendanceEntry)
 
             await classToUpdate.save();
 
@@ -259,14 +244,17 @@ exports.classCtrl = {
     },
     getAttendanceByClassAndDate: async (req, res) => {
         const { classId, date } = req.body;
-   
-        const class1= await ClassModel.findOne({_id:classId});
-       
+
+
+        const class1 = await ClassModel.findOne({ _id: classId });
+
         if (!class1) {
             return res.status(404).json({ error: 'Class not found' });
         }
         const attendanceEntry = class1.attendance_list.filter(entry => {
-            return Date(entry.date) == Date(date)
+            let d1 = new Date(date)
+            let d2 = new Date(entry.date)
+            return d1.toString() == d2.toString()
         });
 
         if (attendanceEntry.length < 1) {

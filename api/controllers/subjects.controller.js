@@ -62,21 +62,22 @@ exports.subjectsCtrl = {
       }
       let student = await StudentModel.findOne({ user_id: user._id });
       let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
-
+      
       let classes = await ClassModel.find({});
-      let classesByTeacher = classes.filter((teacher) =>
-        teacher.classes_list.includes(teacher._id)
+      let classesByTeacher = classes.filter((item) =>
+      teacher.classes_list.includes(item._id)
       );
       let classesId = classesByTeacher.map((item) => String(item._id));
-
+      
       if (!classesId.includes(String(student.class_id))) {
         res.json({ msg: "התלמיד אינו שלך" });
         return;
       }
       let data = await SubjectsModel.find({});
       let subjectByStudent = data.filter((sub) =>
-        student.subjects_list.includes(sub._id)
+      student.subjects_list.includes(sub._id)
       );
+      console.log(subjectByStudent);
       res.json(subjectByStudent);
     } catch (err) {
       res.json({ msg: err });
