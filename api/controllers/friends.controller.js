@@ -7,17 +7,18 @@ const { StudentModel } = require("../models/students.model");
 exports.friendCtrl = {
   getFriendsList: async (req, res) => {
     try {
-      let student = await StudentModel.find({});
-      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
-      let friendsJson = student.filter((stud) => {
-        return teacher.classes_list.includes(stud.class_id);
-      });
-      let friendsJsonID = friendsJson.map((f) => String(f.user_id));
+      let classId=req.params.classId;
+      console.log(classId)
+      let student = await StudentModel.find({class_id:classId}); 
+      console.log(student)  
+      let friendsJsonID = student.map((f) => String(f.user_id));
+      console.log(friendsJsonID)
       let data = await FriendModel.find({});
-      let friendsByTeacher = data.filter((fr) => {
+      let friendsByClass = data.filter((fr) => {
         return friendsJsonID.includes(String(fr.student));
       });
-      res.json(friendsByTeacher);
+      console.log(friendsByClass)
+      res.json(friendsByClass);
     } catch (error) {
       console.log(err);
       res.status(500).json({ msg: "err", err });

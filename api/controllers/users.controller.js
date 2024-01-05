@@ -16,7 +16,7 @@ exports.userlCtrl = {
     }
   },
   getUserById: async (req, res) => {
-    console.log("user by id");
+    
     try {
       let id=req.params.id
       let data = await UserModel.findOne({_id:id}, { password: 0 });
@@ -64,7 +64,7 @@ getCurrentUser: async (req, res) => {
       let data;
       let user = await UserModel.findOne({ _id: req.tokenData._id });
       let userUp = await UserModel.findOne({ idCard: idDelete });
-      console.log(userUp)
+      
       if (req.tokenData.role == "admin" || (idDelete == user.idCard&&req.tokenData.role == "principal")) {
         data = await UserModel.updateOne({ _id: userUp._id }, { $set: { "active": false } });
       }
