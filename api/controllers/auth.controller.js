@@ -165,7 +165,6 @@ exports.authCtrl = {
     try {
 
       let user = await UserModel.findOne({ email: req.body.email, active: "true" });
-
       if (!user) {
         return res
           .status(401)
@@ -175,7 +174,7 @@ exports.authCtrl = {
       if (!authPassword) {
         return res.status(401).json({ msg: "Wrong password" });
       }
-      
+    
       let token = createToken(user._id, user.role);
       // res.cookie("access_token", token, {
       //   maxAge: 60 * 60 * 1000,
