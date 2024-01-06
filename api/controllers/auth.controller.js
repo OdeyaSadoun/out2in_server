@@ -163,7 +163,9 @@ exports.authCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
-      let user = await UserModel.findOne({ email: req.body.email });
+
+      let user = await UserModel.findOne({ email: req.body.email, active: "true" });
+
       if (!user) {
         return res
           .status(401)
@@ -203,7 +205,7 @@ exports.authCtrl = {
       let pass = await bcrypt.hash(req.body.newPassword, 10);
       console.log(pass);
       let data = await UserModel.updateOne(
-        { _id: req.tokenData._id },
+        { _id: req.tokenData._id, active: "true"},
         { $set: { password: pass } }
       );
       res.json(data);
