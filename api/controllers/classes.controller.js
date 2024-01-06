@@ -28,6 +28,8 @@ exports.classCtrl = {
             if (!data) {
                 return res.status(404).json({ msg: "Class not found" });
             }
+
+            data.subjects_list = data.subjects_list.filter(sub => sub.active);
             res.json(data);
         } catch (err) {
             console.error(err);

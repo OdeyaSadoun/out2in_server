@@ -7,6 +7,7 @@ const { testsCtrl } = require('../controllers/tests.controller');
 router.get('/',auth,authRole(["admin"]),subjectsCtrl.getAllSubjects);
 
 router.get('/getSubjecstByStudent/',auth,authRole(["admin","teacher"]),subjectsCtrl.getSubjectsByStudentId);
+router.get('/getCurrentSubject/:subId',auth,authRole(["admin","teacher"]),subjectsCtrl.getCurrentSubject);
 
 router.get('/getSubjectsByClassId/:classId',auth,authRole(["principal", "teacher"]),subjectsCtrl.getSubjectsByClassId);
 

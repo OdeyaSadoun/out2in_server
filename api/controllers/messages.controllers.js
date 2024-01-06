@@ -132,7 +132,7 @@ exports.messagesCtrl = {
 
       const authenticatedUserId = req.tokenData._id;
       if (
-        message.student_id.toString() !== authenticatedUserId &&
+        // message.student_id.toString() !== authenticatedUserId &&
         message.teacher_id.toString() !== authenticatedUserId
       ) {
         return res
