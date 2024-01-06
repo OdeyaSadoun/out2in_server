@@ -164,7 +164,7 @@ exports.authCtrl = {
     }
     try {
       let user = await UserModel.findOne({ email: req.body.email });
-      if (!user||user.active==false) {
+      if (!user) {
         return res
           .status(401)
           .json({ msg: "There is no user with this email" });
