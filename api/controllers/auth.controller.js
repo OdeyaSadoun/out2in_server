@@ -57,11 +57,11 @@ exports.authCtrl = {
       let principal = new PrincipalModel(objPrincipal);
       await principal.save();
       let toSend = {
-        email: user.email,
-        subject: `Hi ${user.name}, this is a message from out2in`,
-        text: `To verify click here`,
+        email: "out2in.siders@gmail.com",
+        subject: `${user.name} מבקש אישור `,
+        text: `מנהל חדש נרשם למערכת, בדוק ואשר אותו באזור האישי`,
       };
-      // sendEmail(toSend)
+      sendEmail(toSend)
 
       res.status(201).json({ details: user, principal: principal });
     } catch (err) {
@@ -164,7 +164,7 @@ exports.authCtrl = {
     }
     try {
       let user = await UserModel.findOne({ email: req.body.email });
-      if (!user) {
+      if (!user||user.active==false) {
         return res
           .status(401)
           .json({ msg: "There is no user with this email" });
@@ -173,6 +173,7 @@ exports.authCtrl = {
       if (!authPassword) {
         return res.status(401).json({ msg: "Wrong password" });
       }
+      
       let token = createToken(user._id, user.role);
       // res.cookie("access_token", token, {
       //   maxAge: 60 * 60 * 1000,

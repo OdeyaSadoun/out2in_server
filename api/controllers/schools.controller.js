@@ -56,7 +56,7 @@ exports.schoolsCtrl = {
         }
         try {
             let school = new SchoolsModel(req.body);
-            school.principal_id = req.tokenData._id;
+            school.principal_id = req.params.id;
         
             await school.save();
             res.status(201).json(school)

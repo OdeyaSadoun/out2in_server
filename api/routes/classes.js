@@ -18,6 +18,8 @@ router.post("/getAttendanceByClassAndDate",auth, authRole('teacher'), classCtrl.
 
 router.post("/places", auth, authRole(["admin","principal", "teacher"]),classCtrl.addPlacesToClass);
 
+router.post("/getMap", auth, authRole(["admin","principal", "teacher"]),classCtrl.getMapsByDateAndClass);
+
 router.post("/",auth, authRole(["admin","principal", "teacher"]), classCtrl.addClass);
 
 router.post("/addAttendance/:classId",auth, authRole(["admin","principal", "teacher"]), classCtrl.AddAttendance);

@@ -4,6 +4,20 @@ const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
 
+
+function getPreviousMonthDate(date) {
+    const today = new Date(date);
+
+    // Set the day to 0 to get the last day of the previous month
+    today.setDate(0);
+
+    const previousMonthYear = today.getFullYear();
+    const previousMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
+
+    // Construct and return the date of the last day of the previous month
+    return new Date(previousMonthYear, previousMonth - 1, 1);
+}
+
 exports.classCtrl = {
     getClassById: async (req, res) => {
         const classId = req.params.id;
@@ -181,9 +195,7 @@ exports.classCtrl = {
                 return res.status(404).json({ error: "Class not found" });
             }
             classToDelete.active = false;
-
             await classToDelete.save();
-
             res
                 .status(200)
                 .json({
@@ -208,16 +220,11 @@ exports.classCtrl = {
                 let d2 = new Date(entry.date)
                 return d1.toString() == d2.toString()
             });
-
             if (attendanceEntry.length < 1) {
                 return res.status(404).json({ error: 'Attendance entry not found for the specified date' });
             }
-            // console.log(attendanceEntry)
             attendanceEntry[0].students_attendance = studentsAttendance
-            // console.log(attendanceEntry)
-
             await classToUpdate.save();
-
             res.status(200).json({ message: 'Attendance updated successfully' });
         } catch (error) {
             console.error('Error:', error);
@@ -241,6 +248,7 @@ exports.classCtrl = {
 
     },
     getAttendanceByClassAndDate: async (req, res) => {
+
         const { classId, date } = req.body;
 
 
@@ -259,6 +267,120 @@ exports.classCtrl = {
             return res.json({ code: 100 });
         }
         return res.json(attendanceEntry[0])
+    }
+    ,
+    getMapsByDateAndClass: async (req, res) => {
+        try {
+            const { classId, date } = req.body;
+            let fullDate1 = new Date(date)
+            let fullDate2 = getPreviousMonthDate(fullDate1)
+            let fullDate3 = getPreviousMonthDate(fullDate2)
+
+            const class1 = await ClassModel.findOne({ _id: classId });
+            if (!class1) {
+                return res.status(404).json({ error: 'Class not found' });
+            }
+
+            let year = fullDate1.getFullYear()
+            let month = fullDate1.getMonth()
+
+            let year2 = fullDate2.getFullYear()
+            let month2 = fullDate2.getMonth()
+
+            let year3 = fullDate3.getFullYear()
+            let month3 = fullDate3.getMonth()
+
+            let studentMap1 = new Map()
+            let studentMap2 = new Map()
+            let studentMap3 = new Map()
+            //----1
+            const attendanceEntry1 = class1.attendance_list.filter(entry => {
+                let fullDateE = new Date(entry.date)
+                let yearE = fullDateE.getFullYear()
+                let monthE = fullDateE.getMonth()
+                return year == yearE && month == monthE
+            });
+            // if (attendanceEntry1.length < 1) {
+            //     return res.json({ msg: "No attendance report was found for this month and year" });
+            // }
+            let days1 = attendanceEntry1.length;
+            attendanceEntry1.forEach((item) => {
+                item.students_attendance.forEach((stu) => {
+                    if (studentMap1.has(String(stu.student_id))) {
+                        if (stu.present)
+                            studentMap1.set(String(stu.student_id), studentMap1.get(String(stu.student_id)) + 1)
+                    }
+                    else {
+                        if (stu.present)
+                            studentMap1.set(String(stu.student_id), 1)
+                        else
+                            studentMap1.set(String(stu.student_id), 0)
+                    }
+                })
+            })
+            //-----2
+            const attendanceEntry2 = class1.attendance_list.filter(entry => {
+                let fullDateE = new Date(entry.date)
+                let yearE = fullDateE.getFullYear()
+                let monthE = fullDateE.getMonth()
+                return year2 == yearE && month2 == monthE
+            });
+            // if (attendanceEntry2.length < 1) {
+            //     return res.json({ msg: "No attendance report was found for this month and year" });
+            // }
+            let days2 = attendanceEntry2.length;
+            attendanceEntry2.forEach((item) => {
+                item.students_attendance.forEach((stu) => {
+                    if (studentMap2.has(String(stu.student_id))) {
+                        if (stu.present)
+                            studentMap2.set(String(stu.student_id), studentMap2.get(String(stu.student_id)) + 1)
+                    }
+                    else {
+                        if (stu.present)
+                            studentMap2.set(String(stu.student_id), 1)
+                        else
+                            studentMap2.set(String(stu.student_id), 0)
+                    }
+                })
+            })
+            //-----3
+            const attendanceEntry3 = class1.attendance_list.filter(entry => {
+                let fullDateE = new Date(entry.date)
+                let yearE = fullDateE.getFullYear()
+                let monthE = fullDateE.getMonth()
+                return year3 == yearE && month3 == monthE
+            });
+            // if (attendanceEntry3.length < 1) {
+            //     return res.json({ msg: "No attendance report was found for this month and year" });
+            // }
+            let days3 = attendanceEntry3.length;
+            attendanceEntry3.forEach((item) => {
+                item.students_attendance.forEach((stu) => {
+                    if (studentMap3.has(String(stu.student_id))) {
+                        if (stu.present)
+                            studentMap3.set(String(stu.student_id), studentMap3.get(String(stu.student_id)) + 1)
+                    }
+                    else {
+                        if (stu.present)
+                            studentMap3.set(String(stu.student_id), 1)
+                        else
+                            studentMap3.set(String(stu.student_id), 0)
+                    }
+                })
+            })
+            let arrStudents=[]
+            for (const key of studentMap1.keys()) {
+                if(studentMap1.get(key)/days1<studentMap2.get(key)/days2&&studentMap2.get(key)/days2<studentMap3.get(key)/days3)
+                arrStudents.push({student_id:key,down:true})
+                else
+                arrStudents.push({student_id:key,down:false})
+
+              }
+            res.json(arrStudents)
+        }
+        catch (err) {
+            res.json(err)
+        }
     }
 
 };

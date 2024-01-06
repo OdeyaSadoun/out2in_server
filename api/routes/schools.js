@@ -8,7 +8,7 @@ const { authRole, auth } = require("../middleware/auth");
 
 router.get("/",auth,authRole(["admin"]),schoolsCtrl.getAllSchools);
 router.get("/:id",auth,authRole(["admin","principal"]),schoolsCtrl.getSchoolById);
-router.post("/",auth,authRole(["admin","principal"]),schoolsCtrl.addSchool);
+router.post("/:id",schoolsCtrl.addSchool);
 router.put("/:id",auth,authRole(["admin","principal"]),schoolsCtrl.updateSchool);
 router.patch("/deleteSchool/:id",auth,authRole(["admin","principal"]),schoolsCtrl.deleteSchool);
 router.get("/schoolInfo/getInfo",auth,authRole(["principal"]),schoolsCtrl.getSchoolByPricipalId);
