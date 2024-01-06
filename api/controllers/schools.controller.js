@@ -9,7 +9,7 @@ exports.schoolsCtrl = {
         let sort = req.query.sort || "date_created";
         let reverse = req.query.reverse == "yes" ? -1 : 1;
         try {
-            let data = await SchoolsModel.find({})
+            let data = await SchoolsModel.find({active: "true"})
                 .limit(perPage)
                 .skip((page - 1) * perPage)
                 .sort({ [sort]: reverse });
@@ -21,9 +21,9 @@ exports.schoolsCtrl = {
     },
 
     getSchoolById: async (req, res) => {
-        let id = req.params.id;
+        let {id} = req.params;
         try {
-            let data = await SchoolsModel.findOne({ _id: id });
+            let data = await SchoolsModel.findOne({ _id: id, active: "true" });
             res.json(data);
         } catch (err) {
             console.log(err);
@@ -34,7 +34,7 @@ exports.schoolsCtrl = {
     getSchoolByPricipalId: async (req, res) => {
         let id = req.tokenData._id;
         try {
-            let data = await SchoolsModel.findOne({ principal_id: id });
+            let data = await SchoolsModel.findOne({ principal_id: id, active: "true" });
             res.json(data);
         } catch (err) {
             console.log(err);
@@ -45,7 +45,7 @@ exports.schoolsCtrl = {
     getAllClassesInSchool: async (req, res) => {
         let school_id = req.params.id;
         try {
-            let data = await SchoolsModel.findOne({ _id: school_id });
+            let data = await SchoolsModel.findOne({ _id: school_id, active: "true" });
             res.json(data);
         } catch (err) {
             console.log(err);
@@ -80,10 +80,10 @@ exports.schoolsCtrl = {
             let idEdit = req.params.id
             let data;
             if (req.tokenData.role == "admin") {
-              data = await SchoolsModel.updateOne({ _id: idEdit }, req.body);
+              data = await SchoolsModel.updateOne({ _id: idEdit, active: "true" }, req.body);
             }
             else {
-              data = await SchoolsModel.updateOne({ _id: idEdit, principal_id: req.tokenData._id }, req.body);
+              data = await SchoolsModel.updateOne({ _id: idEdit, principal_id: req.tokenData._id, active: "true" }, req.body);
             }
             res.json(data);
         }
@@ -94,16 +94,16 @@ exports.schoolsCtrl = {
     },
     
     deleteSchool: async (req, res) => {
-        if (!req.body.active && req.body.active != false) {
-            return res.status(400).json({ msg: "Need to send active in body" });
-        }
+        // if (!req.body.active && req.body.active != false) {
+        //     return res.status(400).json({ msg: "Need to send active in body" });
+        // }
         try {
             let schoolId = req.params.id
             let data;
             if (req.tokenData.role == "admin")
-                data = await SchoolsModel.updateOne({ _id: schoolId }, { active: req.body.active })
+                data = await SchoolsModel.updateOne({ _id: schoolId, active: "true" }, { active: req.body.active })
             else if(req.tokenData.role == "principal") {
-                data = await SchoolsModel.updateOne({ _id: schoolId }, { principal_id: req.tokenData._id }, { active: req.body.active })
+                data = await SchoolsModel.updateOne({ _id: schoolId, active: "true" }, { principal_id: req.tokenData._id }, { active: req.body.active })
                 
             }
             res.json(data);
