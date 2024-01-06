@@ -21,16 +21,15 @@ exports.classCtrl = {
   getClassById: async (req, res) => {
     const classId = req.params.id;
     try {
-      const data = await ClassModel.findOne({
+      const cls = await ClassModel.findOne({
         _id: classId,
         active: "true",
       }).populate("subjects_list");
-      if (!data) {
+      if (!cls) {
         return res.status(404).json({ msg: "Class not found" });
       }
-
-      data.subjects_list = data.subjects_list.filter((sub) => sub.active);
-      res.json(data);
+      //   data.subjects_list = data.subjects_list.filter((sub) => sub.active);
+      res.json(cls);
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Internal server error", err });
@@ -40,14 +39,14 @@ exports.classCtrl = {
   getClassesBySchoolId: async (req, res) => {
     const schoolId = req.params.id;
     try {
-      const data = await ClassModel.find({
+      const cls = await ClassModel.find({
         school_id: schoolId,
         active: "true",
       }).populate("subjects_list");
-      if (!data) {
+      if (!cls) {
         return res.status(404).json({ msg: "Class not found" });
       }
-      res.json(data);
+      res.json(cls);
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Internal server error", err });
@@ -55,12 +54,14 @@ exports.classCtrl = {
   },
 
   getClassesByTeacherId: async (req, res) => {
-    let data = await TeacherModel.findOne({
+    let teacher = await TeacherModel.findOne({
       user_id: req.tokenData._id,
       active: "true",
     }).populate("classes_list");
-
-    res.json(data.classes_list);
+    if (!teacher) {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
+    res.json(teacher.classes_list);
   },
 
   getAllClasses: async (req, res) => {
@@ -70,11 +71,14 @@ exports.classCtrl = {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-      let data = await ClassModel.find({ active: "true" })
+      let classes = await ClassModel.find({ active: "true" })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-      res.json(data);
+      if (!classes) {
+        return res.status(404).json({ msg: "Classes not found" });
+      }
+      res.json(classes);
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Internal Server Error", err });
@@ -84,6 +88,9 @@ exports.classCtrl = {
   getAllPlaces: async (req, res) => {
     try {
       const students = await StudentModel.find({ active: "true" });
+      if (!students) {
+        return res.status(404).json({ msg: "Students not found" });
+      }
       const placesList = students.map((student) => student.place);
       res.status(200).json({ places: placesList });
     } catch (error) {
@@ -256,6 +263,7 @@ exports.classCtrl = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
   AddAttendance: async (req, res) => {
     try {
       let { attendance } = req.body;
@@ -264,6 +272,9 @@ exports.classCtrl = {
         _id: classId,
         active: "true",
       });
+      if (!classToChange) {
+        return res.status(404).json({ msg: "Class not found" });
+      }
       let arrAttendance = classToChange.attendance_list;
       arrAttendance.push(attendance);
       classToChange.attendance_list = arrAttendance;
@@ -273,6 +284,7 @@ exports.classCtrl = {
       res.json(err);
     }
   },
+
   getAttendanceByClassAndDate: async (req, res) => {
     const { classId, date } = req.body;
     const class1 = await ClassModel.findOne({ _id: classId, active: "true" });

@@ -6,13 +6,22 @@ const { StudentModel } = require("../models/students.model");
 exports.friendCtrl = {
   getFriendsList: async (req, res) => {
     try {
-      let {classId}=req.params;
-     
-      let student = await StudentModel.find({class_id:classId, active: "true"}); 
- 
+      let { classId } = req.params;
+
+      let student = await StudentModel.find({
+        class_id: classId,
+        active: "true",
+      });
+      if (!student) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
+
       let friendsJsonID = student.map((f) => String(f.user_id));
 
-      let data = await FriendModel.find({active: "true"});
+      let data = await FriendModel.find({ active: "true" });
+      if (!data) {
+        return res.status(404).json({ msg: "Friends not found" });
+      }
       let friendsByClass = data.filter((fr) => {
         return friendsJsonID.includes(String(fr.student));
       });

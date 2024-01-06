@@ -5,7 +5,10 @@ exports.testsCtrl = {
   getTestById: async (req, res) => {
     let { testId } = req.params;
     try {
-      let data = await TestModel.findOne({ _id: testId , active: "true"});
+      let data = await TestModel.findOne({ _id: testId, active: "true" });
+      if (!data) {
+        return res.status(404).json({ msg: "Test not found" });
+      }
       res.json(data);
     } catch (err) {
       console.log(err);
@@ -24,7 +27,9 @@ exports.testsCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-
+      if (!tests) {
+        return res.status(404).json({ msg: "Tests not found" });
+      }
       // let testsFilter = tests.filter((test) => test.active);
       res.json(tests);
     } catch (err) {
@@ -39,17 +44,30 @@ exports.testsCtrl = {
     let student_class;
     try {
       const student = await StudentModel.findOne({
-        _id: studentId, active: "true"
+        _id: studentId,
+        active: "true",
       }).populate("user_id", { password: 0 });
-
+      if (!student) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
       student_class = await ClassModel.findOne({
-        _id: student.class_id, active: "true"
+        _id: student.class_id,
+        active: "true",
       }).populate("subjects_list");
+      if (!student_class) {
+        return res.status(404).json({ msg: "Class not found" });
+      }
 
       const subjects_list = student_class.subjects_list;
       await subjects_list.map(async (subject, i) => {
         let last_test_id = subject.tests_list.slice(-1);
-        const last_test = await TestModel.findOne({ _id: last_test_id , active: "true"});
+        const last_test = await TestModel.findOne({
+          _id: last_test_id,
+          active: "true",
+        });
+        if (!last_test) {
+          return res.status(404).json({ msg: "Test not found" });
+        }
         const student_grade = last_test.grades_list.filter((grade) => {
           return String(grade.student_id) === String(studentId);
         });
@@ -65,10 +83,10 @@ exports.testsCtrl = {
   },
 
   addTestToSubject: async (req, res) => {
-    const {subId} = req.params;
+    const { subId } = req.params;
     const testId = req.body.test_id;
 
-    let subject = await SubjectsModel.findOne({ _id: subId , active: "true"});
+    let subject = await SubjectsModel.findOne({ _id: subId, active: "true" });
     if (!subject) {
       return res.status(404).json({ msg: "Subject not found" });
     }

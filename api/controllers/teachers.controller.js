@@ -11,22 +11,32 @@ exports.teacherlCtrl = {
         user_id: req.tokenData._id,
         active: "true",
       }).populate("schools_list");
+      if (!teacherInfo) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
       res.json({ user: req.userInfo, other: teacherInfo });
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
+
   getAllTeachers: async (req, res) => {
     try {
       let school = await SchoolsModel.findOne({
         principal_id: req.tokenData._id,
         active: "true",
       });
+      if (!school) {
+        return res.status(404).json({ msg: "School not found" });
+      }
       let data = await TeacherModel.find({ active: "true" }).populate(
         "user_id",
         { password: 0 }
       );
+      if (!data) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
       let teacherByPrincipal = data.filter(
         (teach) =>
           teach.schools_list.includes(school._id) &&
@@ -40,16 +50,24 @@ exports.teacherlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+
   getAllTeachersByStudent: async (req, res) => {
     try {
       let student = await StudentModel.findOne({
         user_id: req.tokenData._id,
         active: "true",
       });
+      if (!student) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
+
       let data = await TeacherModel.find({ active: "true" }).populate(
         "user_id",
         { password: 0 }
       );
+      if (!data) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
       let teachersByClass = data.filter((teacher) =>
         teacher.classes_list.includes(student.class_id)
       );
@@ -59,26 +77,40 @@ exports.teacherlCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+
   getClasses: async (req, res) => {
     let data = await TeacherModel.findOne({
       user_id: req.tokenData._id,
       active: "true",
     }).populate("classes_list");
+    if (!data) {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
     // let data2 =await TeacherModel.find({})
     res.json(data.classes_list);
   },
+
   addSchool: async (req, res) => {
     let id = req.params.id;
-    let school = await SchoolsModel.findOne({
-      principal_id: req.tokenData._id,
-      active: "true",
-    });
     try {
+      let school = await SchoolsModel.findOne({
+        principal_id: req.tokenData._id,
+        active: "true",
+      });
+      if (!school) {
+        return res.status(404).json({ msg: "School not found" });
+      }
       let user = await UserModel.findOne({ idCard: id, active: "true" });
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
       let teacher = await TeacherModel.findOne({
         user_id: user._id,
         active: "true",
       });
+      if (!teacher) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
       let array = teacher.schools_list;
       array.push(school._id);
       let upTeacher = await TeacherModel.updateOne(
@@ -90,13 +122,20 @@ exports.teacherlCtrl = {
       res.json({ "err from add school": err });
     }
   },
+
   editTeacher: async (req, res) => {
     let idEdit = req.params.id;
     let user = await UserModel.findOne({
       _id: req.tokenData._id,
       active: "true",
     });
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
     let userUp = await UserModel.findOne({ idCard: idEdit, active: "true" });
+    if (!userUp) {
+      return res.status(404).json({ msg: "User to update not found" });
+    }
     // let validBody = userValidate(req.body);
     // if (validBody.error) {
     //   return res.status(400).json(validBody.error.details);
