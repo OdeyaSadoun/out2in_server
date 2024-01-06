@@ -21,6 +21,23 @@ exports.teacherlCtrl = {
     }
   },
 
+  getTeacherById: async (req, res) => {
+    let {idCard} = req.body;
+    try {
+      let teacher = await TeacherModel.findOne({
+        user_id: id,
+        active: "true",
+      }).populate("user_id", { password: 0 });
+      if (!teacher) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
+      res.json(teacher);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+
   getAllTeachers: async (req, res) => {
     try {
       let school = await SchoolsModel.findOne({

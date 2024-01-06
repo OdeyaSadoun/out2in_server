@@ -121,6 +121,7 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  
   getSocialRankForStudent: async (req, res) => {},
   getTheLowesSocialRankStudents: async (req, res) => {},
   getAllSocialRankStudents: async (req, res) => {},

@@ -109,6 +109,11 @@ exports.authCtrl = {
     } catch (err) {
       if (err.code == 11000) {
         if (err.code == 11000) {
+          let school = await SchoolsModel.findOne({
+            principal_id: req.tokenData._id,
+          });
+          let teacher =  req.body.other ;
+          let data = await TeacherModel.updateOne({idCard: validBody.idCard}, {$push: {schools_list: school._id, classes_list: teacher.classes_list}})
           return res.status(500).json({
             msg: "A teacher already exists in the system, add an existing teacher",
             code: 11000,
