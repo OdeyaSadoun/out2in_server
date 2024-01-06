@@ -98,7 +98,7 @@ exports.schoolsCtrl = {
                 data = await SchoolsModel.updateOne({ _id: schoolId }, { active: req.body.active })
             else if(req.tokenData.role == "principal") {
                 data = await SchoolsModel.updateOne({ _id: schoolId }, { principal_id: req.tokenData._id }, { active: req.body.active })
-                console.log("principal_id", req.tokenData._id);
+                
             }
             res.json(data);
         }

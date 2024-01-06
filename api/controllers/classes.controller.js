@@ -206,15 +206,19 @@ exports.classCtrl = {
             }
 
             // Find the attendance entry for the specified date
-            const attendanceEntry = classToUpdate.attendance_list.find(entry => entry.date.toISOString() === date);
 
-            if (!attendanceEntry) {
+
+            const attendanceEntry = classToUpdate.attendance_list.filter(entry => {
+                return Date(entry.date) == Date(date)
+            });
+
+            if (attendanceEntry.length < 1) {
                 return res.status(404).json({ error: 'Attendance entry not found for the specified date' });
             }
 
             // Update the students' attendance in the found entry
             studentsAttendance.forEach(student => {
-                const existingStudentAttendance = attendanceEntry.students_attendance.find(sa => sa.student_id.toString() === student.student_id.toString());
+                const existingStudentAttendance = attendanceEntry[0].students_attendance.find(sa => sa.student_id.toString() === student.student_id.toString());
 
                 if (existingStudentAttendance) {
                     existingStudentAttendance.present = student.present;
@@ -246,10 +250,27 @@ exports.classCtrl = {
             classToChange.save()
             res.json(classToChange)
         }
-        catch(err){
+        catch (err) {
             res.json(err)
         }
-        
+
+    },
+    getAttendanceByClassAndDate: async (req, res) => {
+        const { classId, date } = req.body;
+   
+        const class1= await ClassModel.findOne({_id:classId});
+       
+        if (!class1) {
+            return res.status(404).json({ error: 'Class not found' });
+        }
+        const attendanceEntry = class1.attendance_list.filter(entry => {
+            return Date(entry.date) == Date(date)
+        });
+
+        if (attendanceEntry.length < 1) {
+            return res.json({ code: 100 });
+        }
+        return res.json(attendanceEntry[0])
     }
 
 };

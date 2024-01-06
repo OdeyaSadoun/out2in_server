@@ -43,10 +43,14 @@ exports.studentCtrl = {
       let students = await StudentModel.find({class_id:classId}).populate("user_id", {
         password: 0,
       });
+
+      let studentsActive = students.filter((s=>s.user_id.active==true))
+   
+
       // let studentJson = data.filter((stud) => {
       //   return stud.class_id == classId;
       // });
-      res.json(students);
+      res.json(studentsActive);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -65,7 +69,7 @@ exports.studentCtrl = {
       //     return { student: stud, user: userData };
       //   })
       // );
-      console.log(data);
+      
       res.json(data);
     } catch (err) {
       console.log(err);
