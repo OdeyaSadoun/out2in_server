@@ -20,12 +20,13 @@ exports.testsCtrl = {
     let sort = req.query.sort || "date_created";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await TestModel.find({ _id: testId })
+      let tests = await TestModel.find({ _id: testId })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
 
-      res.json(data);
+      let testsFilter = tests.filter((test) => test.active);
+      res.json(testsFilter);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -93,7 +94,7 @@ exports.testsCtrl = {
   deleteTest: async (req, res) => {
     try {
       const { testId } = req.params;
-      const test = await TestModel.findById(testId);
+      const test = await TestModel.findOne({ _id: testId });
       if (!test) {
         return res.status(404).json({ msg: "Test not found" });
       }
