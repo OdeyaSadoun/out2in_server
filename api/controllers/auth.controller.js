@@ -163,7 +163,9 @@ exports.authCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
+
       let user = await UserModel.findOne({ email: req.body.email, active: "true" });
+
       if (!user) {
         return res
           .status(401)
