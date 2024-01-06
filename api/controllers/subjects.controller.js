@@ -24,6 +24,16 @@ exports.subjectsCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  getCurrentSubject: async (req, res) => {
+    const {subId} = req.param;
+    try {
+      let data = await SubjectsModel.findOne({_id: subId, active: "true"});
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
 
   getAllSubjectsByClassId: async (req, res) => {
     let perPage = Math.min(req.query.perPage, 10) || 10;
