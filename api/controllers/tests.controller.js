@@ -5,7 +5,7 @@ exports.testsCtrl = {
   getTestById: async (req, res) => {
     let { testId } = req.params;
     try {
-      let data = await TestModel.findOne({ _id: testId });
+      let data = await TestModel.findOne({ _id: testId , active: "true"});
       res.json(data);
     } catch (err) {
       console.log(err);
@@ -20,13 +20,13 @@ exports.testsCtrl = {
     let sort = req.query.sort || "date_created";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let tests = await TestModel.find({ _id: testId })
+      let tests = await TestModel.find({ _id: testId, active: "true" })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
 
-      let testsFilter = tests.filter((test) => test.active);
-      res.json(testsFilter);
+      // let testsFilter = tests.filter((test) => test.active);
+      res.json(tests);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -39,17 +39,17 @@ exports.testsCtrl = {
     let student_class;
     try {
       const student = await StudentModel.findOne({
-        _id: studentId,
+        _id: studentId, active: "true"
       }).populate("user_id", { password: 0 });
 
       student_class = await ClassModel.findOne({
-        _id: student.class_id,
+        _id: student.class_id, active: "true"
       }).populate("subjects_list");
 
       const subjects_list = student_class.subjects_list;
       await subjects_list.map(async (subject, i) => {
         let last_test_id = subject.tests_list.slice(-1);
-        const last_test = await TestModel.findOne({ _id: last_test_id });
+        const last_test = await TestModel.findOne({ _id: last_test_id , active: "true"});
         const student_grade = last_test.grades_list.filter((grade) => {
           return String(grade.student_id) === String(studentId);
         });
@@ -65,22 +65,21 @@ exports.testsCtrl = {
   },
 
   addTestToSubject: async (req, res) => {
-    const subId = req.params.subId;
+    const {subId} = req.params;
     const testId = req.body.test_id;
 
-    let subject = await SubjectsModel.findOne({ _id: subId });
+    let subject = await SubjectsModel.findOne({ _id: subId , active: "true"});
     if (!subject) {
       return res.status(404).json({ msg: "Subject not found" });
     }
     let data = await SubjectsModel.updateOne(
-      { _id: subId },
+      { _id: subId, active: "true" },
       { $push: { tests_list: testId } }
     );
     console.log(data);
   },
 
   addGrades: async (req, res) => {
-    console.log(req.body);
     try {
       let newTest = new TestModel(req.body);
       await newTest.save();
@@ -94,13 +93,13 @@ exports.testsCtrl = {
   deleteTest: async (req, res) => {
     try {
       const { testId } = req.params;
-      const test = await TestModel.findOne({ _id: testId });
+      const test = await TestModel.findOne({ _id: testId, active: "true" });
       if (!test) {
         return res.status(404).json({ msg: "Test not found" });
       }
 
       let data = await TestModel.updateOne(
-        { _id: testId },
+        { _id: testId, active: "true" },
         { $set: { active: false } }
       );
 

@@ -12,11 +12,11 @@ exports.subjectsCtrl = {
     let sort = req.query.sort || "date_created";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await SubjectsModel.find({})
+      let data = await SubjectsModel.find({active: "true"})
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-      let filterData = await SubjectsModel.find({ class_id: classId });
+      let filterData = await SubjectsModel.find({ class_id: classId , active: "true"});
 
       res.json(filterData);
     } catch (err) {
@@ -43,7 +43,7 @@ exports.subjectsCtrl = {
 
     let { classId } = req.params;
     try {
-      let data = await SubjectsModel.find({ class_id: classId })
+      let data = await SubjectsModel.find({ class_id: classId, active: "true" })
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
@@ -64,15 +64,15 @@ exports.subjectsCtrl = {
   getSubjectsByStudentId: async (req, res) => {
     try {
       let id = req.body.idCard;
-      let user = await UserModel.findOne({ idCard: id });
+      let user = await UserModel.findOne({ idCard: id, active: "true" });
       if (!user) {
         res.json({ msg: "אין תלמיד עם תעודת זהות זו" });
         return;
       }
-      let student = await StudentModel.findOne({ user_id: user._id });
-      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
+      let student = await StudentModel.findOne({ user_id: user._id, active: "true" });
+      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id, active: "true" });
       
-      let classes = await ClassModel.find({});
+      let classes = await ClassModel.find({active: "true"});
       let classesByTeacher = classes.filter((item) =>
       teacher.classes_list.includes(item._id)
       );
@@ -82,11 +82,10 @@ exports.subjectsCtrl = {
         res.json({ msg: "התלמיד אינו שלך" });
         return;
       }
-      let data = await SubjectsModel.find({});
+      let data = await SubjectsModel.find({active: "true"});
       let subjectByStudent = data.filter((sub) =>
       student.subjects_list.includes(sub._id)
       );
-      console.log(subjectByStudent);
       res.json(subjectByStudent);
     } catch (err) {
       res.json({ msg: err });
@@ -128,16 +127,16 @@ exports.subjectsCtrl = {
     try {
       let { classId } = req.params;
   
-      let classObj = await ClassModel.findOne({ _id: classId });
+      let classObj = await ClassModel.findOne({ _id: classId, active: "true" });
   
       let subjectsJson = await Promise.all(
         classObj.subjects_list.map(async (sub) => {
-          const subData = await SubjectsModel.findOne({ _id: sub._id });
+          const subData = await SubjectsModel.findOne({ _id: sub._id, active: "true" });
   
           let tests = await Promise.all(
             subData.tests_list.map(async (testId) => {
               try {
-                const test = await TestModel.findOne({ _id: testId });
+                const test = await TestModel.findOne({ _id: testId, active: "true" });
                 return test.active ? test : null; // Filter out inactive tests
               } catch (err) {
                 console.error("Error fetching test:", err);
@@ -177,15 +176,13 @@ exports.subjectsCtrl = {
   },
 
   addSubjectToClass: async (req, res) => {
-    const classId = req.params.classId;
+    const {classId} = req.params;
     const subjectId = req.body.subject_id;
-    let cls = await ClassModel.findOne({ _id: classId });
-    console.log(cls.subjects_list);
+    let cls = await ClassModel.findOne({ _id: classId, active: "true" });
 
     let data = await ClassModel.updateOne(
-      { _id: classId },
+      { _id: classId, active: "true" },
       { $push: { subjects_list: subjectId } }
     );
-    console.log(data);
   },
 };

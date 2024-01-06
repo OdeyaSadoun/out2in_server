@@ -1,23 +1,21 @@
 // const py = require("py");
 const { default: axios } = require("axios");
 const { FriendModel } = require("../models/friends.model");
-const { TeacherModel } = require("../models/teachers.model");
 const { StudentModel } = require("../models/students.model");
 
 exports.friendCtrl = {
   getFriendsList: async (req, res) => {
     try {
-      let classId=req.params.classId;
+      let {classId}=req.params;
      
-      let student = await StudentModel.find({class_id:classId}); 
+      let student = await StudentModel.find({class_id:classId, active: "true"}); 
  
       let friendsJsonID = student.map((f) => String(f.user_id));
 
-      let data = await FriendModel.find({});
+      let data = await FriendModel.find({active: "true"});
       let friendsByClass = data.filter((fr) => {
         return friendsJsonID.includes(String(fr.student));
       });
-      console.log(friendsByClass)
       res.json(friendsByClass);
     } catch (error) {
       console.log(err);
@@ -31,8 +29,6 @@ exports.friendCtrl = {
       const student = req.tokenData._id;
       let newAnswer;
 
-      console.log(friendsList);
-
       if (!student) {
         return res.status(404).json({ error: "Student not found" });
       }
@@ -43,7 +39,6 @@ exports.friendCtrl = {
         });
       }
 
-      console.log(newAnswer);
       await newAnswer.save();
       res.status(201).json(newAnswer);
     } catch (error) {
@@ -66,7 +61,6 @@ exports.friendCtrl = {
           }
         );
 
-        console.log(response.data);
         res.status(200).json(response.data);
       } catch (error) {
         console.error("Error:", error);

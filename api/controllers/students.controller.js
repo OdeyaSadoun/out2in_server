@@ -10,7 +10,7 @@ exports.studentCtrl = {
   getStudentInfo: async (req, res) => {
     try {
       let studentInfo = await StudentModel.findOne({
-        user_id: req.tokenData._id,
+        user_id: req.tokenData._id, active: "true"
       }).populate("user_id", { password: 0 });
       res.json(studentInfo);
     } catch (err) {
@@ -20,17 +20,14 @@ exports.studentCtrl = {
   },
   getAllStudentsTeacher: async (req, res) => {
     try {
-      let data = await StudentModel.find({}).populate("user_id", {
+      let data = await StudentModel.find({active: "true"}).populate("user_id", {
         password: 0,
       });
-      // console.log(req.tokenData._id);
-      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id });
+      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id, active: "true" });
 
-      // console.log(teacher);
       let studentJson = data.filter((stud) => {
         return teacher.classes_list.includes(stud.class_id);
       });
-      // console.log(studentJson);
       res.json(studentJson);
     } catch (err) {
       console.log(err);
@@ -38,19 +35,19 @@ exports.studentCtrl = {
     }
   },
   getAllStudentsByClassId: async (req, res) => {
-    let classId = req.params.classId;
+    let {classId} = req.params;
     try {
-      let students = await StudentModel.find({class_id:classId}).populate("user_id", {
+      let students = await StudentModel.find({class_id:classId, active: "true"}).populate("user_id", {
         password: 0,
       });
 
-      let studentsActive = students.filter((s=>s.user_id.active==true))
+      // let studentsActive = students.filter((s=>s.user_id.active==true))
    
 
       // let studentJson = data.filter((stud) => {
       //   return stud.class_id == classId;
       // });
-      res.json(studentsActive);
+      res.json(students);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -59,7 +56,7 @@ exports.studentCtrl = {
 
   getAllStudents: async (req, res) => {
     try {
-      let data = await StudentModel.find({}).populate("user_id", {
+      let data = await StudentModel.find({active: "true"}).populate("user_id", {
         password: 0,
       });
 
@@ -83,7 +80,7 @@ exports.studentCtrl = {
     let student_id = req.params.id;
     try {
       let studentInfo = await StudentModel.findOne({
-        user_id: student_id,
+        user_id: student_id, active: "true"
       }).populate("user_id", { password: 0 });
       res.json(studentInfo);
     } catch (err) {
