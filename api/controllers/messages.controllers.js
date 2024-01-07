@@ -250,10 +250,7 @@ exports.messagesCtrl = {
         return res.status(404).json("Students in this class not found");
       }
 
-      const studentIds = await Promise.all(
-        studentsClass.map((student) => mongoose.Types.ObjectId(student._id))
-      );
-      console.log(studentIds);
+      const studentIds = studentsClass.map((student) => student._id.toString());
 
       // Find important messages sent in the last month
       const lastMonth = new Date();
@@ -261,13 +258,13 @@ exports.messagesCtrl = {
 
       // Find messages sent by students in the last month
       const importantMessages = await MessageModel.find({
-        student_id: { $in: studentIds },
+        student_id: {
+          $in: studentIds.map((id) => mongoose.Types.ObjectId(id)),
+        },
         important: true,
         date_created: { $gte: lastMonth },
         active: true,
       });
-
-      console.log("importantMessages", importantMessages);
 
       const studentsWithImportantMessages = studentsClass.map((student) => {
         // Check if the student sent an important message in the last month
