@@ -6,7 +6,7 @@ exports.registerValidate = (_reqBody) => {
     idCard:Joi.string().max(9).required(),
     name: Joi.string().min(2).max(50).required(),
     phone: Joi.string().min(2).max(20).required(),
-    address:Joi.string().min(2).max(20).required(),
+    address:Joi.allow(),
     email: Joi.string()
       .email({
         minDomainSegments: 2,
