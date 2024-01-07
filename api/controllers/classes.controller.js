@@ -409,8 +409,8 @@ exports.classCtrl = {
           studentMap1.get(key) / days1 < studentMap2.get(key) / days2 &&
           studentMap2.get(key) / days2 < studentMap3.get(key) / days3
         )
-          arrStudents.push({ student_id: key, down: true });
-        else arrStudents.push({ student_id: key, down: false });
+          arrStudents.push({ student: key, down: true });
+        else arrStudents.push({ student: key, down: false });
       }
       res.json(arrStudents);
     } catch (err) {

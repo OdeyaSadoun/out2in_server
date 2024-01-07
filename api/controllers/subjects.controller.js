@@ -197,7 +197,6 @@ exports.subjectsCtrl = {
           return subData;
         })
       );
-
       res.json(subjectsJson);
     } catch (err) {
       res.json({ msg: err });
@@ -234,4 +233,18 @@ exports.subjectsCtrl = {
       { $push: { subjects_list: subjectId } }
     );
   },
+  deleteSubjectById: async (req, res) => {
+    try {
+      let id = req.params.subId
+      let sub = await SubjectsModel.updateOne(
+        { _id: id, active: "true" },
+        { $set: { active: false } }
+      );
+      res.json(sub)
+    }
+    catch (err) {
+      res.json(err)
+    }
+
+  }
 };

@@ -21,6 +21,8 @@ router.patch ('/addTestToSubject/:subId',auth,authRole(["teacher"]),testsCtrl.ad
 
 router.patch ('/addSubjectToClass/:classId',auth,authRole(["teacher"]),subjectsCtrl.addSubjectToClass);//grade send in body
 
+router.patch ('/deleteSubject/:subId',auth,authRole(["teacher"]),subjectsCtrl.deleteSubjectById);//delete
+
 module.exports=router;
 
 
