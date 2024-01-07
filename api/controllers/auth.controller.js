@@ -228,5 +228,15 @@ exports.authCtrl = {
       res.json(err);
     }
   },
+  sendEmailFrom:async(req,res)=>{
+    // console.log(req.body)
+    let toSend = {
+      email: req.body.email,
+      subject: req.body.subject,
+      text: req.body.text,
+    };
+    sendEmail(toSend)
+    res.json("send")
+  }
   
 };

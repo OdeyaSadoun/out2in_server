@@ -15,6 +15,7 @@ router.post("/register/teacher",auth,authRole("principal"),authCtrl.registerTeac
 router.post("/register/student",auth,authRole("teacher"),authCtrl.registerStudent);
 router.post("/login", authCtrl.login);
 router.post("/logout", authCtrl.logout);
+router.post("/sendEmail", authCtrl.sendEmailFrom);
 
 // router.get("/myInfo", auth, userlCtrl.getUserInfo);
 

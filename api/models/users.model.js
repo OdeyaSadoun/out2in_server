@@ -2,9 +2,12 @@
 const mongoose = require("mongoose");
 
 let userSchema = new mongoose.Schema({
-  idCard: {type:String, unique:true},
+  idCard: { type: String, unique: true },
   name: String,
-  address: String,
+  address: {
+    city: String,
+    street: String
+  },
   phone: String,
   email: String,
   password: String,
@@ -20,9 +23,9 @@ let userSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
-  active:{
-    type:Boolean,
-    default:true
+  active: {
+    type: Boolean,
+    default: true
   }
 });
 
