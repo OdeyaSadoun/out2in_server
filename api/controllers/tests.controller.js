@@ -1,25 +1,28 @@
 const { SubjectsModel } = require("../models/subjects.model");
 const { TestModel } = require("../models/tests.model");
 
-
-const getTestsBalanceByStudentId1 = async (studentId,class_id) => {
+const getTestsBalanceByStudentId1 = async (studentId, class_id) => {
   let gradesSum1 = 0;
   let gradesSum2 = 0;
   let gradesSum3 = 0;
 
   try {
-    // const student = await StudentModel.findOne({ _id: studentId }).populate("user_id", { password: 0 });
-    const studentClass = await ClassModel.findOne({ _id: class_id }).populate("subjects_list");
+    const studentClass = await ClassModel.findOne({
+      _id: class_id,
+      active: "true",
+    }).populate("subjects_list");
     const subjectsList = studentClass.subjects_list;
 
     for (const subject of subjectsList) {
       const lastTestsIds = subject.tests_list.slice(-3);
 
       for (const testId of lastTestsIds) {
-        const test = await TestModel.findOne({ _id: testId, active: true });
+        const test = await TestModel.findOne({ _id: testId, active: "true" });
 
         if (test) {
-          const studentGrade = test.grades_list.find((grade) => String(grade.student_id) === String(studentId));
+          const studentGrade = test.grades_list.find(
+            (grade) => String(grade.student_id) === String(studentId)
+          );
 
           if (studentGrade) {
             switch (lastTestsIds.indexOf(testId)) {
@@ -42,26 +45,25 @@ const getTestsBalanceByStudentId1 = async (studentId,class_id) => {
     const avgGrades1 = gradesSum1 / subjectsCount;
     const avgGrades2 = gradesSum2 / subjectsCount;
     const avgGrades3 = gradesSum3 / subjectsCount;
-    if (avgGrades1 > avgGrades2 > avgGrades3)
-      return true;
-    else
-      return false
+    if (avgGrades1 > avgGrades2 > avgGrades3) return true;
+    else return false;
     // return { gradesAvg1: avgGrades1, gradesAvg2: avgGrades2, gradesAvg3: avgGrades3 };
   } catch (err) {
     console.log({ msg: "err", err });
     return { error: "Internal server error" };
   }
-}
+};
 
 exports.testsCtrl = {
   getTestsBalanceByStudentId: async (req, res) => {
-
     const classId = req.params.classId;
-    const classStudents = await StudentModel.find({ class_id: classId });
+    const classStudents = await StudentModel.find({ class_id: classId, active: "true"  });
     const class_balance_arr = [];
     for (const student of classStudents) {
-      let avg = await getTestsBalanceByStudentId1(student._id,classId)
-      class_balance_arr.push({ srudent_id: student._id, avg: avg });
+      let avg = await getTestsBalanceByStudentId1(student._id, classId);
+      class_balance_arr.push({ student_id: student._id, avg: avg });
+    }
+  },
 
   getTestById: async (req, res) => {
     let { testId } = req.params;
@@ -79,17 +81,12 @@ exports.testsCtrl = {
 
   getAllGradesByTestId: async (req, res) => {
     let { testId } = req.params;
-    let perPage = Math.min(req.query.perPage, 10) || 10;
-    let page = req.query.page || 1;
-    let sort = req.query.sort || "date_created";
-    let reverse = req.query.reverse == "yes" ? -1 : 1;
+
     try {
-      let test = await TestModel.findOne({ _id: testId, active: "true" })
-     console.log("aaa", test);
+      let test = await TestModel.findOne({ _id: testId, active: "true" });
       if (!test) {
         return res.status(404).json({ msg: "Test not found" });
       }
-      // let testsFilter = tests.filter((test) => test.active);
       res.json(test);
     } catch (err) {
       console.log(err);
