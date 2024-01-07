@@ -3,6 +3,9 @@ const router = express.Router();
 const { auth, authRole } = require("../middleware/auth");
 const { testsCtrl } = require("../controllers/tests.controller");
 
+// router.post ('/addTest',auth,authRole(["teacher"]),testsCtrl.addTest);//grade send in body
+router.get('/balance/:classId',auth,authRole(["teacher"]),testsCtrl.getTestsBalanceByStudentId);//grade send in body with)
+
 router.get(
   "/:testId",
   auth,
