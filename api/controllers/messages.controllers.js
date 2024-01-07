@@ -59,12 +59,15 @@ const checkMessageIfHasBullyingWords = async (msg) => {
 exports.messagesCtrl = {
   getMessagesByUserId: async (req, res) => {
     try {
-      const {teacherId} = req.params;
+      const { teacherId } = req.params;
       let messages = await MessageModel.find({
-        teacher_id: teacherId , active: "true"
+        teacher_id: teacherId,
+        active: "true",
       }).populate("student_id");
+      if (!messages) {
+        return res.status(404).json({ msg: "Messages not found" });
+      }
       // let messagesActive = messages.filter((m) => m.active == true);
-
       res.json(messages);
     } catch (err) {
       console.log(err);
@@ -74,7 +77,7 @@ exports.messagesCtrl = {
 
   sendMessageToTeacher: async (req, res) => {
     try {
-      const {studentId} = req.params;
+      const { studentId } = req.params;
 
       const { teacher_id, title, value } = req.body;
 
@@ -100,7 +103,10 @@ exports.messagesCtrl = {
   sendMessagesToAll: async (req, res) => {
     try {
       const { teacherId, title, value } = req.body;
-      const allStudents = await StudentModel.find({active: "true"}, "_id");
+      const allStudents = await StudentModel.find({ active: "true" }, "_id");
+      if (!allStudents) {
+        return res.status(404).json({ msg: "Students not found" });
+      }
       for (const student of allStudents) {
         const newMessage = new MessageModel({
           student_id: student._id,
@@ -124,15 +130,16 @@ exports.messagesCtrl = {
   deleteMessage: async (req, res) => {
     try {
       const { messageId } = req.params;
-      const message = await MessageModel.findOne({_id: messageId, active: "true"});
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
 
       const authenticatedUserId = req.tokenData._id;
-      if (
-        message.teacher_id.toString() !== authenticatedUserId
-      ) {
+      if (message.teacher_id.toString() !== authenticatedUserId) {
         return res
           .status(403)
           .json({ msg: "You do not have permission to delete this message" });
@@ -155,7 +162,10 @@ exports.messagesCtrl = {
       const { messageId } = req.params;
       const { read } = req.body;
 
-      const message = await MessageModel.findOne({_id: messageId, active: "true"});
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
@@ -175,7 +185,10 @@ exports.messagesCtrl = {
   checkMessage: async (req, res) => {
     try {
       const { messageId } = req.params;
-      const message = await MessageModel.findOne({ _id: messageId, active: "true" });
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
@@ -194,7 +207,10 @@ exports.messagesCtrl = {
       const { messageId } = req.params;
       const { important } = req.body;
 
-      const message = await MessageModel.findOne({_id: messageId, active: "true"});
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }

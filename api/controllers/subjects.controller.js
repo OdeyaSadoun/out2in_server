@@ -1,3 +1,4 @@
+
 const { SubjectsModel } = require("../models/subjects.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
@@ -12,23 +13,32 @@ exports.subjectsCtrl = {
     let sort = req.query.sort || "date_created";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let data = await SubjectsModel.find({active: "true"})
-        .limit(perPage)
-        .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
-      let filterData = await SubjectsModel.find({ class_id: classId , active: "true"});
-
+      // let data = await SubjectsModel.find({active: "true"})
+      //   .limit(perPage)
+      //   .skip((page - 1) * perPage)
+      //   .sort({ [sort]: reverse });
+      let filterData = await SubjectsModel.find({
+        class_id: classId,
+        active: "true",
+      });
+      if (!filterData) {
+        return res.status(404).json({ msg: "Subjects not found" });
+      }
       res.json(filterData);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
+
   getCurrentSubject: async (req, res) => {
-    const {subId} = req.param;
+    const { subId } = req.param;
     try {
-      let data = await SubjectsModel.findOne({_id: subId, active: "true"});
-      res.json(data);
+      let subject = await SubjectsModel.findOne({ _id: subId, active: "true" });
+      if (!subject) {
+        return res.status(404).json({ msg: "Subject not found" });
+      }
+      res.json(subject);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -47,7 +57,9 @@ exports.subjectsCtrl = {
         .limit(perPage)
         .skip((page - 1) * perPage)
         .sort({ [sort]: reverse });
-
+      if (!data) {
+        return res.status(404).json({ msg: "Subjects not found" });
+      }
       let filterData = data.filter((sub) => sub.active);
       let activeTests = filterData.tests_list.filter((test) => test.active);
       filterData.tests_list = activeTests;
@@ -59,8 +71,6 @@ exports.subjectsCtrl = {
     }
   },
 
-  //            data.subjects_list = data.subjects_list.filter(sub => sub.active);
-
   getSubjectsByStudentId: async (req, res) => {
     try {
       let id = req.body.idCard;
@@ -69,22 +79,43 @@ exports.subjectsCtrl = {
         res.json({ msg: "אין תלמיד עם תעודת זהות זו" });
         return;
       }
-      let student = await StudentModel.findOne({ user_id: user._id, active: "true" });
-      let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id, active: "true" });
-      
-      let classes = await ClassModel.find({active: "true"});
+      let student = await StudentModel.findOne({
+        user_id: user._id,
+        active: "true",
+      });
+
+      if (!student) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
+
+      let teacher = await TeacherModel.findOne({
+        user_id: req.tokenData._id,
+        active: "true",
+      });
+      if (!teacher) {
+        return res.status(404).json({ msg: "Teacher not found" });
+      }
+
+      let classes = await ClassModel.find({ active: "true" });
+      if (!classes) {
+        return res.status(404).json({ msg: "Classes not found" });
+      }
+
       let classesByTeacher = classes.filter((item) =>
-      teacher.classes_list.includes(item._id)
+        teacher.classes_list.includes(item._id)
       );
       let classesId = classesByTeacher.map((item) => String(item._id));
-      
+
       if (!classesId.includes(String(student.class_id))) {
         res.json({ msg: "התלמיד אינו שלך" });
         return;
       }
-      let data = await SubjectsModel.find({active: "true"});
+      let data = await SubjectsModel.find({ active: "true" });
+      if (!data) {
+        return res.status(404).json({ msg: "Subjects not found" });
+      }
       let subjectByStudent = data.filter((sub) =>
-      student.subjects_list.includes(sub._id)
+        student.subjects_list.includes(sub._id)
       );
       res.json(subjectByStudent);
     } catch (err) {
@@ -126,37 +157,52 @@ exports.subjectsCtrl = {
   getSubjectsByClassId: async (req, res) => {
     try {
       let { classId } = req.params;
-  
+
       let classObj = await ClassModel.findOne({ _id: classId, active: "true" });
-  
+      if (!classObj) {
+        return res.status(404).json({ msg: "Class not found" });
+      }
+
       let subjectsJson = await Promise.all(
         classObj.subjects_list.map(async (sub) => {
-          const subData = await SubjectsModel.findOne({ _id: sub._id, active: "true" });
-  
+          const subData = await SubjectsModel.findOne({
+            _id: sub._id,
+            active: "true",
+          });
+          // if (!subData) {
+          //   return res.status(404).json({ msg: "Subject not found" });
+          // }
+
           let tests = await Promise.all(
             subData.tests_list.map(async (testId) => {
               try {
-                const test = await TestModel.findOne({ _id: testId, active: "true" });
-                return test.active ? test : null; // Filter out inactive tests
+                const test = await TestModel.findOne({
+                  _id: testId,
+                  active: "true",
+                });
+                // if (!test) {
+                //   return res.status(404).json({ msg: "Test not found" });
+                // }
+                return test;
+                // .active ? test : null; // Filter out inactive tests
               } catch (err) {
                 console.error("Error fetching test:", err);
                 return null; // Handle errors gracefully
               }
             })
           );
-  
+
           subData.tests_list = tests.filter(Boolean); // Remove null values
-  
+
           return subData;
         })
       );
-  
+
       res.json(subjectsJson);
     } catch (err) {
       res.json({ msg: err });
     }
   },
-  
 
   addSubject: async (req, res) => {
     try {
@@ -176,9 +222,12 @@ exports.subjectsCtrl = {
   },
 
   addSubjectToClass: async (req, res) => {
-    const {classId} = req.params;
+    const { classId } = req.params;
     const subjectId = req.body.subject_id;
     let cls = await ClassModel.findOne({ _id: classId, active: "true" });
+    if (!cls) {
+      return res.status(404).json({ msg: "Class not found" });
+    }
 
     let data = await ClassModel.updateOne(
       { _id: classId, active: "true" },

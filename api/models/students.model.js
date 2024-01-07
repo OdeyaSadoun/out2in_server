@@ -20,7 +20,15 @@ let studentSchema = new mongoose.Schema({
   social_index:{
     type:Number,
     default:0
-  }
+  },
+  last_questionnaire_answered_date: {
+    type: Date,
+    default:null
+  },
+  // hasAnsweredMonthlyQuestionnaire: {
+  //   type:Boolean,
+  //   default:false
+  // }
   
 });
 
