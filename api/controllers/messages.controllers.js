@@ -1,4 +1,7 @@
+const { default: mongoose } = require("mongoose");
+const { ClassModel } = require("../models/classes.model");
 const { MessageModel } = require("../models/messages.model");
+const { StudentModel } = require("../models/students.model");
 const { UserModel } = require("../models/users.model");
 const { messageValidate } = require("../validations/messages.validation");
 
@@ -28,6 +31,7 @@ const checkMessageIfHasBullyingWords = async (msg) => {
     "מכות",
     "מרביצים לי",
     "נפגעתי",
+    "פגעו בי",
     "לא מרגיש בטוח",
     "לא מרגיש שייך",
     "לא מרגיש מוערך",
@@ -223,6 +227,60 @@ exports.messagesCtrl = {
         { $set: { important: important } }
       );
       res.json(message);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "Error", error: err.message });
+    }
+  },
+
+  getStudentListThatSendImportanteMessageByClassId: async (req, res) => {
+    const { classId } = req.params;
+    try {
+      let cls = await ClassModel.findOne({ _id: classId, active: true });
+
+      if (!cls) {
+        return res.status(404).json("Class not found");
+      }
+
+      let studentsClass = await StudentModel.find({
+        class_id: classId,
+        active: true,
+      });
+      if (!studentsClass || studentsClass.length === 0) {
+        return res.status(404).json("Students in this class not found");
+      }
+
+      const studentIds = await Promise.all(
+        studentsClass.map((student) => mongoose.Types.ObjectId(student._id))
+      );
+      console.log(studentIds);
+
+      // Find important messages sent in the last month
+      const lastMonth = new Date();
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+      // Find messages sent by students in the last month
+      const importantMessages = await MessageModel.find({
+        student_id: { $in: studentIds },
+        important: true,
+        date_created: { $gte: lastMonth },
+        active: true,
+      });
+
+      console.log("importantMessages", importantMessages);
+
+      const studentsWithImportantMessages = studentsClass.map((student) => {
+        // Check if the student sent an important message in the last month
+        const hasImportantMessage = importantMessages.some((message) =>
+          message.student_id.equals(student._id)
+        );
+        return {
+          student_id: student._id,
+          hasImportantMessage: hasImportantMessage,
+        };
+      });
+
+      res.status(200).json({ studentsWithImportantMessages });
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Error", error: err.message });
