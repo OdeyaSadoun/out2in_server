@@ -272,7 +272,7 @@ exports.messagesCtrl = {
           message.student_id.equals(student._id)
         );
         return {
-          student_id: student._id,
+          student: student.user_id,
           hasImportantMessage: hasImportantMessage,
         };
       });

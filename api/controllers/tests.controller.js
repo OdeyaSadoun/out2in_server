@@ -125,7 +125,7 @@ exports.testsCtrl = {
           student._id,
           classId
         );
-        arr_balance.push({ student_id: student._id, down: studBalance });
+        arr_balance.push({ student: student.user_id, down: studBalance });
       }
 
       res.json(arr_balance);
