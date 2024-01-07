@@ -121,7 +121,40 @@ exports.studentCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
-  
+
+  updateLastQuestionnaireAnsweredDate: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { lastQuestionnaireAnsweredDate } = req.body;
+
+      if (
+        !lastQuestionnaireAnsweredDate ||
+        !lastQuestionnaireAnsweredDate instanceof Date
+      ) {
+        return res.status(400).json({
+          error: "Invalid date",
+        });
+      }
+
+      // עדכן את השדה
+      await StudentModel.updateOne(
+        { user_id: id },
+        {
+          $set: {
+            lastQuestionnaireAnsweredDate: lastQuestionnaireAnsweredDate,
+          },
+        }
+      );
+
+      res.json({
+        message: "Last questionnaire answered date updated successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+
   getSocialRankForStudent: async (req, res) => {},
   getTheLowesSocialRankStudents: async (req, res) => {},
   getAllSocialRankStudents: async (req, res) => {},
