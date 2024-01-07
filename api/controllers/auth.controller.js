@@ -7,7 +7,10 @@ const { PrincipalModel } = require("../models/principals.model");
 const { TeacherModel } = require("../models/teachers.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
-const {registerValidate,loginValidate,} = require("../validations/auth.validation");
+const {
+  registerValidate,
+  loginValidate,
+} = require("../validations/auth.validation");
 
 const sendEmail = (req) => {
   // Create a transporter with your SMTP configuration
@@ -58,7 +61,7 @@ exports.authCtrl = {
         subject: `${user.name} מבקש אישור `,
         text: `מנהל חדש נרשם למערכת, בדוק ואשר אותו באזור האישי`,
       };
-      sendEmail(toSend)
+      sendEmail(toSend);
 
       res.status(201).json({ details: user, principal: principal });
     } catch (err) {
@@ -104,18 +107,37 @@ exports.authCtrl = {
       await teacher.save();
       res.status(201).json(teacher);
     } catch (err) {
+      console.log(err);
       if (err.code == 11000) {
-        if (err.code == 11000) {
-          let school = await SchoolsModel.findOne({
-            principal_id: req.tokenData._id,
-          });
-          let teacher =  req.body.other ;
-          let data = await TeacherModel.updateOne({idCard: validBody.idCard}, {$push: {schools_list: school._id, classes_list: teacher.classes_list}})
-          return res.status(500).json({
-            msg: "A teacher already exists in the system, add an existing teacher",
-            code: 11000,
-          });
+        let school = await SchoolsModel.findOne({
+          principal_id: req.tokenData._id,
+        });
+        // let teacher = req.body.other;
+        console.log(req.body);
+        let teacher = await TeacherModel.findOne({
+          idCard: req.body.user.idCard,
+        });
+        console.log("********************", teacher);
+        console.log(teacher.schools_list);
+        console.log(school._id);
+        if (teacher.schools_list.includes(school._id)) {
+          console.log("yyay");
+          return res.status(500).json({ msg: "err", err });
         }
+        let data = await TeacherModel.updateOne(
+          { idCard: validBody.idCard },
+          {
+            $push: {
+              schools_list: school._id,
+              classes_list: teacher.classes_list,
+            },
+          }
+        );
+        return res.status(500).json({
+          msg: "A teacher already exists in the system, add an existing teacher",
+          code: 11000,
+        });
+      } else {
         console.log(err);
         res.status(500).json({ msg: "err", err });
       }
@@ -165,8 +187,10 @@ exports.authCtrl = {
       return res.status(400).json(validBody.error.details);
     }
     try {
-
-      let user = await UserModel.findOne({ email: req.body.email, active: "true" });
+      let user = await UserModel.findOne({
+        email: req.body.email,
+        active: "true",
+      });
       if (!user) {
         return res
           .status(401)
@@ -176,7 +200,7 @@ exports.authCtrl = {
       if (!authPassword) {
         return res.status(401).json({ msg: "Wrong password" });
       }
-    
+
       let token = createToken(user._id, user.role);
       // res.cookie("access_token", token, {
       //   maxAge: 60 * 60 * 1000,
@@ -206,7 +230,7 @@ exports.authCtrl = {
       let pass = await bcrypt.hash(req.body.newPassword, 10);
       console.log(pass);
       let data = await UserModel.updateOne(
-        { _id: req.tokenData._id, active: "true"},
+        { _id: req.tokenData._id, active: "true" },
         { $set: { password: pass } }
       );
       res.json(data);
@@ -218,7 +242,7 @@ exports.authCtrl = {
   activeTrue: async (req, res) => {
     try {
       let id = req.params.id;
-   
+
       let data = await UserModel.updateOne(
         { _id: id },
         { $set: { active: true } }
@@ -228,5 +252,4 @@ exports.authCtrl = {
       res.json(err);
     }
   },
-  
 };
