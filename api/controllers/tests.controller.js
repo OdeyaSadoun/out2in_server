@@ -35,28 +35,20 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
               case 0:
                 gradesSum3 += Number(studentGrade.grade);
                 gradesCount3++;
-                // console.log("sum3", gradesSum3);
-                // console.log("cnt3", gradesCount3);
                 break;
               case 1:
                 gradesSum2 += Number(studentGrade.grade);
                 gradesCount2++;
-                // console.log("sum2", gradesSum2);
-                // console.log("cnt2", gradesCount2);
                 break;
               case 2:
                 gradesSum1 += Number(studentGrade.grade);
                 gradesCount1++;
-                // console.log("sum1", gradesSum1);
-                // console.log("cnt1", gradesCount1);
                 break;
             }
           }
         }
       }
     }
-
-    // const subjectsCount = subjectsList.length > 0 ? subjectsList.length : 1; // To avoid division by zero
     const avgGrades1 = gradesCount1 == 0 ? 0 : gradesSum1 / gradesCount1;
     const avgGrades2 = gradesCount2 == 0 ? 0 : gradesSum2 / gradesCount2;
     const avgGrades3 = gradesCount3 == 0 ? 0 : gradesSum3 / gradesCount3;
@@ -129,17 +121,12 @@ exports.testsCtrl = {
 
       const arr_balance = [];
       for (const student of students) {
-        // if (student._id == "65965f7ebe5b46de8189a66f") {
         let studBalance = await getTestsBalanceByStudentId(
           student._id,
           classId
         );
         arr_balance.push({ student_id: student._id, down: studBalance });
-        // }
       }
-
-      // console.log("studentsBalances", studentsBalances);
-      // console.log("arr_balance", arr_balance);
 
       res.json(arr_balance);
     } catch (err) {
