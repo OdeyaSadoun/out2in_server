@@ -3,10 +3,13 @@ const { StudentModel } = require("../models/students.model");
 const { SubjectsModel } = require("../models/subjects.model");
 const { TestModel } = require("../models/tests.model");
 
-const getTestsBalanceByStudentId1 = async (studentId, class_id) => {
+const getTestsBalanceByStudentId = async (studentId, class_id) => {
   let gradesSum1 = 0;
+  let gradesCount1 = 0;
   let gradesSum2 = 0;
+  let gradesCount2 = 0;
   let gradesSum3 = 0;
+  let gradesCount3 = 0;
 
   try {
     const studentClass = await ClassModel.findOne({
@@ -30,13 +33,22 @@ const getTestsBalanceByStudentId1 = async (studentId, class_id) => {
           if (studentGrade) {
             switch (lastTestsIds.indexOf(testId)) {
               case 0:
-                gradesSum1 += Number(studentGrade.grade);
+                gradesSum3 += Number(studentGrade.grade);
+                gradesCount3++;
+                // console.log("sum3", gradesSum3);
+                // console.log("cnt3", gradesCount3);
                 break;
               case 1:
                 gradesSum2 += Number(studentGrade.grade);
+                gradesCount2++;
+                // console.log("sum2", gradesSum2);
+                // console.log("cnt2", gradesCount2);
                 break;
               case 2:
-                gradesSum3 += Number(studentGrade.grade);
+                gradesSum1 += Number(studentGrade.grade);
+                gradesCount1++;
+                // console.log("sum1", gradesSum1);
+                // console.log("cnt1", gradesCount1);
                 break;
             }
           }
@@ -44,13 +56,15 @@ const getTestsBalanceByStudentId1 = async (studentId, class_id) => {
       }
     }
 
-    const subjectsCount = subjectsList.length > 0 ? subjectsList.length : 1; // To avoid division by zero
-    const avgGrades1 = gradesSum1 / subjectsCount;
-    const avgGrades2 = gradesSum2 / subjectsCount;
-    const avgGrades3 = gradesSum3 / subjectsCount;
-    if (avgGrades1 > avgGrades2 > avgGrades3) return true;
-    else return false;
-    // return { gradesAvg1: avgGrades1, gradesAvg2: avgGrades2, gradesAvg3: avgGrades3 };
+    // const subjectsCount = subjectsList.length > 0 ? subjectsList.length : 1; // To avoid division by zero
+    const avgGrades1 = gradesCount1 == 0 ? 0 : gradesSum1 / gradesCount1;
+    const avgGrades2 = gradesCount2 == 0 ? 0 : gradesSum2 / gradesCount2;
+    const avgGrades3 = gradesCount3 == 0 ? 0 : gradesSum3 / gradesCount3;
+    console.log(avgGrades1, avgGrades2, avgGrades3);
+    if (avgGrades3 < avgGrades2 && avgGrades2 < avgGrades1) {
+      return true;
+    }
+    return false;
   } catch (err) {
     console.log({ msg: "err", err });
     return { error: "Internal server error" };
@@ -58,18 +72,18 @@ const getTestsBalanceByStudentId1 = async (studentId, class_id) => {
 };
 
 exports.testsCtrl = {
-  getTestsBalanceByStudentId: async (req, res) => {
-    const classId = req.params.classId;
-    const classStudents = await StudentModel.find({
-      class_id: classId,
-      active: "true",
-    });
-    const class_balance_arr = [];
-    for (const student of classStudents) {
-      let avg = await getTestsBalanceByStudentId1(student._id, classId);
-      class_balance_arr.push({ student_id: student._id, avg: avg });
-    }
-  },
+  // getTestsBalanceByStudentId: async (req, res) => {
+  //   const classId = req.params.classId;
+  //   const classStudents = await StudentModel.find({
+  //     class_id: classId,
+  //     active: "true",
+  //   });
+  //   const class_balance_arr = [];
+  //   for (const student of classStudents) {
+  //     let avg = await getTestsBalanceByStudentId1(student._id, classId);
+  //     class_balance_arr.push({ student_id: student._id, avg: avg });
+  //   }
+  // },
 
   getTestById: async (req, res) => {
     let { testId } = req.params;
@@ -114,50 +128,18 @@ exports.testsCtrl = {
       }
 
       const arr_balance = [];
-      const studentsBalances = await Promise.all(
-        students.map(async (student) => {
-          let studBalance = await getTestsBalanceByStudentId1(student._id, classId);
-          console.log("studBalance", studBalance);
-          arr_balance.push({student_id: student._id, down: studBalance});
-          //   let gradesSum = 0;
-          //   const student_class = await ClassModel.findOne({
-          //     _id: student.class_id,
-          //     active: "true",
-          //   }).populate("subjects_list");
+      for (const student of students) {
+        // if (student._id == "65965f7ebe5b46de8189a66f") {
+        let studBalance = await getTestsBalanceByStudentId(
+          student._id,
+          classId
+        );
+        arr_balance.push({ student_id: student._id, down: studBalance });
+        // }
+      }
 
-          //   if (!student_class) {
-          //     return { student: student.user_id.name, balance: null };
-          //   }
-
-          //   const subjectsList = student_class.subjects_list;
-
-          //   for (const subject of subjectsList) {
-          //     const lastTestId = subject.tests_list.slice(-1)[0];
-          //     const lastTest = await TestModel.findOne({
-          //       _id: lastTestId,
-          //       active: "true",
-          //     });
-
-          //     if (!lastTest) {
-          //       return { student: student.user_id.name, balance: null };
-          //     }
-
-          //     const studentGrade = lastTest.grades_list.find(
-          //       (grade) => String(grade.student_id) === String(student._id)
-          //     );
-
-          //     if (studentGrade) {
-          //       gradesSum += Number(studentGrade.grade);
-          //     }
-          //   }
-
-          //   return {
-          //     student: student.user_id.name,
-          //     balance: gradesSum / subjectsList.length,
-          //   };
-        })
-      );
-      console.log("arr_balance", arr_balance);
+      // console.log("studentsBalances", studentsBalances);
+      // console.log("arr_balance", arr_balance);
 
       res.json(arr_balance);
     } catch (err) {
