@@ -44,6 +44,12 @@ router.get(
     authRole(["admin", "teacher", "student"]),
     messagesCtrl.checkMessage
   );
+  router.get(
+    "/getStudentListThatSendImportanteMessageByClassId/:classId",
+    auth,
+    authRole(["teacher", "admin"]),
+    messagesCtrl.getStudentListThatSendImportanteMessageByClassId
+  );
   
 router.patch(
     "/checkMessage/:messageId",

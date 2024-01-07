@@ -58,11 +58,21 @@ exports.friendCtrl = {
 
   calcSocialIndexStudentsByQuestionnaire: async (req, res) => {
     try {
-      const friends_list = req.body;
+      const {
+        friends_list,
+        grades_record,
+        attendance_record,
+        important_messages_record,
+      } = req.body;
       try {
         const response = await axios.post(
           "http://127.0.0.1:5000/calculate_social_index",
-          { friends_list: friends_list },
+          {
+            friends_list,
+            grades_record,
+            attendance_record,
+            important_messages_record,
+          },
           {
             headers: {
               "Content-type": "application/json",

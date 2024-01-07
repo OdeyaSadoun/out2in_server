@@ -17,6 +17,7 @@ router.get(
   authRole(["teacher", "admin"]),
   testsCtrl.getTestById
 );
+
 router.get(
   "/getAllGradesByTestId/:testId",
   auth,
