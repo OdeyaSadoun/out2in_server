@@ -17,7 +17,8 @@ exports.registerValidate = (_reqBody) => {
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
       birthDate:Joi.allow(),
-      role:Joi.allow()
+      role:Joi.allow(),
+      active:Joi.allow()
 
     
   });

@@ -29,6 +29,8 @@ router.get("/attendance/:id", auth, authRole("teacher"), studentCtrl.getAttendan
 
 router.put("/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
 
+router.patch("/updateLastQuestionnaireAnsweredDate/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateLastQuestionnaireAnsweredDate);
+
 // router.patch("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.deleteStudent);
 
 module.exports = router;

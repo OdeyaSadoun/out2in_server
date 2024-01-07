@@ -3,7 +3,6 @@ const { UserModel } = require("../models/users.model");
 const { messageValidate } = require("../validations/messages.validation");
 
 const checkMessageIfHasBullyingWords = async (msg) => {
-  console.log("message server", msg);
   const bullyingWords = new Set([
     "חרם",
     "מחרימים אותי",
@@ -60,13 +59,16 @@ const checkMessageIfHasBullyingWords = async (msg) => {
 exports.messagesCtrl = {
   getMessagesByUserId: async (req, res) => {
     try {
-      const teacherId = req.params.teacherId;
+      const { teacherId } = req.params;
       let messages = await MessageModel.find({
         teacher_id: teacherId,
+        active: "true",
       }).populate("student_id");
-      let messagesActive = messages.filter((m) => m.active == true);
-
-      res.json(messagesActive);
+      if (!messages) {
+        return res.status(404).json({ msg: "Messages not found" });
+      }
+      // let messagesActive = messages.filter((m) => m.active == true);
+      res.json(messages);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "Error", error: err.message });
@@ -75,7 +77,7 @@ exports.messagesCtrl = {
 
   sendMessageToTeacher: async (req, res) => {
     try {
-      const studentId = req.params.studentId;
+      const { studentId } = req.params;
 
       const { teacher_id, title, value } = req.body;
 
@@ -101,7 +103,10 @@ exports.messagesCtrl = {
   sendMessagesToAll: async (req, res) => {
     try {
       const { teacherId, title, value } = req.body;
-      const allStudents = await StudentModel.find({}, "_id");
+      const allStudents = await StudentModel.find({ active: "true" }, "_id");
+      if (!allStudents) {
+        return res.status(404).json({ msg: "Students not found" });
+      }
       for (const student of allStudents) {
         const newMessage = new MessageModel({
           student_id: student._id,
@@ -125,23 +130,23 @@ exports.messagesCtrl = {
   deleteMessage: async (req, res) => {
     try {
       const { messageId } = req.params;
-      const message = await MessageModel.findById(messageId);
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
 
       const authenticatedUserId = req.tokenData._id;
-      if (
-        message.student_id.toString() !== authenticatedUserId &&
-        message.teacher_id.toString() !== authenticatedUserId
-      ) {
+      if (message.teacher_id.toString() !== authenticatedUserId) {
         return res
           .status(403)
           .json({ msg: "You do not have permission to delete this message" });
       }
 
       let data = await MessageModel.updateOne(
-        { _id: messageId },
+        { _id: messageId, active: "true" },
         { $set: { active: false } }
       );
 
@@ -157,13 +162,16 @@ exports.messagesCtrl = {
       const { messageId } = req.params;
       const { read } = req.body;
 
-      const message = await MessageModel.findById(messageId);
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
 
       let data = await MessageModel.updateOne(
-        { _id: messageId },
+        { _id: messageId, active: "true" },
         { $set: { read: read } }
       );
 
@@ -177,21 +185,15 @@ exports.messagesCtrl = {
   checkMessage: async (req, res) => {
     try {
       const { messageId } = req.params;
-      console.log(messageId);
-      const message = await MessageModel.findOne({ _id: messageId });
-      console.log(message);
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
 
       let important = await checkMessageIfHasBullyingWords(message);
-      console.log(important, "important");
-
-      //   if (important) {
-      //     message.important = true;
-      //   }
-
-      //   await message.save();
 
       res.json({ important: important });
     } catch (err) {
@@ -205,7 +207,10 @@ exports.messagesCtrl = {
       const { messageId } = req.params;
       const { important } = req.body;
 
-      const message = await MessageModel.findById(messageId);
+      const message = await MessageModel.findOne({
+        _id: messageId,
+        active: "true",
+      });
       if (!message) {
         return res.status(404).json({ msg: "Message not found" });
       }
@@ -214,12 +219,9 @@ exports.messagesCtrl = {
         message.important = true;
       }
       let data = await MessageModel.updateOne(
-        { _id: messageId },
+        { _id: messageId, active: "true" },
         { $set: { important: important } }
       );
-
-      console.log(message);
-
       res.json(message);
     } catch (err) {
       console.error(err);

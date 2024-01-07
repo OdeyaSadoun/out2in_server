@@ -1,11 +1,42 @@
-const express=require('express');
-const router=express.Router();
-const {subjectsCtrl } = require('../controllers/subjects.controller');
-const { auth, authRole } = require('../middleware/auth');
-const { testsCtrl } = require('../controllers/tests.controller');
+const express = require("express");
+const router = express.Router();
+const { auth, authRole } = require("../middleware/auth");
+const { testsCtrl } = require("../controllers/tests.controller");
 
 // router.post ('/addTest',auth,authRole(["teacher"]),testsCtrl.addTest);//grade send in body
 router.get('/balance/:classId',auth,authRole(["teacher"]),testsCtrl.getTestsBalanceByStudentId);//grade send in body with)
-router.post ('/addGrades',auth,authRole(["teacher"]),testsCtrl.addGrades);//grade send in body
 
-module.exports=router;
+router.get(
+  "/:testId",
+  auth,
+  authRole(["teacher", "admin"]),
+  testsCtrl.getTestById
+);
+router.get(
+  "/getAllGradesByTestId/:testId",
+  auth,
+  authRole(["teacher", "admin"]),
+  testsCtrl.getAllGradesByTestId
+);
+router.get(
+  "/balance/:studentId",
+  auth,
+  authRole(["teacher"]),
+  testsCtrl.GetTestsBalanceByStudentId
+);
+router.post(
+  "/addGrades",
+  auth,
+  authRole(["teacher", "admin"]),
+  testsCtrl.addGrades
+);
+router.patch(
+  "/deleteTest/:testId",
+  auth,
+  authRole(["teacher", "admin"]),
+  testsCtrl.deleteTest
+);
+
+router.post("/addGrades", auth, authRole(["teacher"]), testsCtrl.addGrades);
+
+module.exports = router;
