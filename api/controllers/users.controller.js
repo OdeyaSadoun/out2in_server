@@ -8,7 +8,7 @@ const { StudentModel } = require("../models/students.model");
 exports.userlCtrl = {
   getAllUsers: async (req, res) => {
     try {
-      let data = await UserModel.find({ active: "true"}, { password: 0 });
+      let data = await UserModel.find({ active: "true" }, { password: 0 });
       res.json(data);
     } catch (err) {
       console.log(err);
@@ -16,22 +16,22 @@ exports.userlCtrl = {
     }
   },
   getUserById: async (req, res) => {
-    
+
     try {
-      let id=req.params.id
-      let data = await UserModel.findOne({_id:id, active: "true"}, { password: 0 });
+      let id = req.params.id
+      let data = await UserModel.findOne({ _id: id, active: "true" }, { password: 0 });
       res.json(data);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
     }
   },
-getCurrentUser: async (req, res) => {
-  let data = await UserModel.findOne({_id:req.tokenData._id, active: "true"}, { password: 0 });
-  res.json(data);
-},
+  getCurrentUser: async (req, res) => {
+    let data = await UserModel.findOne({ _id: req.tokenData._id, active: "true" }, { password: 0 });
+    res.json(data);
+  },
   editUser: async (req, res) => {
-    let {idEdit} = req.params;
+    let { idEdit } = req.params;
     let validBody = userValidate(req.body);
     if (validBody.error) {
       return res.status(400).json(validBody.error.details);
@@ -64,15 +64,15 @@ getCurrentUser: async (req, res) => {
       let data;
       let user = await UserModel.findOne({ _id: req.tokenData._id, active: "true" });
       let userUp = await UserModel.findOne({ idCard: idDelete, active: "true" });
-      
-      if (req.tokenData.role == "admin" || (idDelete == user.idCard&&req.tokenData.role == "principal")) {
+
+      if (req.tokenData.role == "admin" || (idDelete == user.idCard && req.tokenData.role == "principal")) {
         data = await UserModel.updateOne({ _id: userUp._id, active: "true" }, { $set: { "active": false } });
       }
       else if (req.tokenData.role == "principal") {
         let school = await SchoolsModel.findOne(
           { principal_id: req.tokenData._id, active: "true" }
         );
-        let data2 = await TeacherModel.find({active: "true"});
+        let data2 = await TeacherModel.find({ active: "true" });
         let teacherByPrincipal = data2.filter(teach => teach.schools_list.includes(school._id))
         let teacherByPrincipal1 = teacherByPrincipal.filter(teach => {
           let uid = String(userUp._id)
@@ -93,11 +93,11 @@ getCurrentUser: async (req, res) => {
       }
       else if (req.tokenData.role == "teacher") {
         try {
-          let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id , active: "true"})
-          let classes = await ClassModel.find({active: "true"});
+          let teacher = await TeacherModel.findOne({ user_id: req.tokenData._id, active: "true" })
+          let classes = await ClassModel.find({ active: "true" });
           let classesByTeacher = classes.filter(item => teacher.classes_list.includes(item._id))
           let classesId = classesByTeacher.map(item => String(item._id))
-          let data2 = await StudentModel.find({active: "true"});
+          let data2 = await StudentModel.find({ active: "true" });
           let studentByTeacher = data2.filter(stu => {
             stuClass = String(stu.class_id)
             return classesId.includes(stuClass)
@@ -110,7 +110,7 @@ getCurrentUser: async (req, res) => {
           data = await UserModel.updateOne({ _id: studentByTeacher1[0].user_id, active: "true" }, { $set: { "active": false } });
         }
         catch (err) {
-          res.json( "The student is not in your class or you have no classes" )
+          res.json("The student is not in your class or you have no classes")
         }
       }
       else {
@@ -127,4 +127,14 @@ getCurrentUser: async (req, res) => {
       res.status(500).json({ err });
     }
   },
+  getPrincipalsAwaitingApproval: async (req, res) => {
+    try {
+      let principals = await UserModel.find({ active: false, role: "principal" })
+      res.json(principals)
+    }
+    catch (err) {
+      res.status(400).json(err)
+    }
+
+  }
 };

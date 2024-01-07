@@ -7,10 +7,7 @@ const { PrincipalModel } = require("../models/principals.model");
 const { TeacherModel } = require("../models/teachers.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
-const {
-  registerValidate,
-  loginValidate,
-} = require("../validations/auth.validation");
+const {registerValidate,loginValidate,} = require("../validations/auth.validation");
 
 const sendEmail = (req) => {
   // Create a transporter with your SMTP configuration
@@ -216,8 +213,9 @@ exports.authCtrl = {
   activeTrue: async (req, res) => {
     try {
       let id = req.params.id;
-      let data = UserModel.updateOne(
-        { idCard: id },
+   
+      let data = await UserModel.updateOne(
+        { _id: id },
         { $set: { active: true } }
       );
       res.json(data);
@@ -225,4 +223,5 @@ exports.authCtrl = {
       res.json(err);
     }
   },
+  
 };

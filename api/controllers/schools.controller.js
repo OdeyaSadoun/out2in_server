@@ -41,6 +41,16 @@ exports.schoolsCtrl = {
             res.status(500).json({ msg: "err", err });
         }
     },
+    getSchoolByPricipalIdParams: async (req, res) => {
+        let id = req.params.id;
+        try {
+            let data = await SchoolsModel.findOne({ principal_id: id, active: "true" });
+            res.json(data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ msg: "err", err });
+        }
+    },
 
     getAllClassesInSchool: async (req, res) => {
         let school_id = req.params.id;
