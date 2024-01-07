@@ -125,30 +125,32 @@ exports.studentCtrl = {
   updateLastQuestionnaireAnsweredDate: async (req, res) => {
     try {
       const { id } = req.params;
-      const { lastQuestionnaireAnsweredDate } = req.body;
+      const { lastDate } = req.body;
 
-      if (
-        !lastQuestionnaireAnsweredDate ||
-        !lastQuestionnaireAnsweredDate instanceof Date
-      ) {
+      let student = await StudentModel.findOne({
+        user_id: id,
+        active: "true",
+      }).populate("user_id", {password:0});
+      if (!student) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
+      console.log(student);
+
+      if (!lastDate || !lastDate instanceof Date) {
         return res.status(400).json({
           error: "Invalid date",
         });
       }
 
-      // עדכן את השדה
-      await StudentModel.updateOne(
+      let data = await StudentModel.findOneAndUpdate(
         { user_id: id },
         {
-          $set: {
-            lastQuestionnaireAnsweredDate: lastQuestionnaireAnsweredDate,
-          },
-        }
+          last_questionnaire_answered_date: lastDate,
+        },
+        {new: true}
       );
 
-      res.json({
-        message: "Last questionnaire answered date updated successfully",
-      });
+      res.json(data);
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "err", err });

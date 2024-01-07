@@ -23,6 +23,7 @@ let studentSchema = new mongoose.Schema({
   },
   last_questionnaire_answered_date: {
     type: Date,
+    default:null
   },
   // hasAnsweredMonthlyQuestionnaire: {
   //   type:Boolean,

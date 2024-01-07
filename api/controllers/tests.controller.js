@@ -23,15 +23,13 @@ exports.testsCtrl = {
     let sort = req.query.sort || "date_created";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
-      let tests = await TestModel.find({ _id: testId, active: "true" })
-        .limit(perPage)
-        .skip((page - 1) * perPage)
-        .sort({ [sort]: reverse });
-      if (!tests) {
-        return res.status(404).json({ msg: "Tests not found" });
+      let test = await TestModel.findOne({ _id: testId, active: "true" })
+     console.log("aaa", test);
+      if (!test) {
+        return res.status(404).json({ msg: "Test not found" });
       }
       // let testsFilter = tests.filter((test) => test.active);
-      res.json(tests);
+      res.json(test);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
