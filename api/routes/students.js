@@ -15,6 +15,9 @@ router.get("/allStudents", auth, authRole(["admin", "principal"]), studentCtrl.g
 
 router.get("/:id", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.getStudentById);
 
+router.get("/getByStudentId/:studentId", auth, authRole(["admin", "principal", "teacher"]), studentCtrl.getStudentByStudentId);
+
+
 router.get("/socialRank/:id", auth, authRole("teacher"), studentCtrl.getSocialRankForStudent);
 
 router.get("/studentsInLowSocialRank", auth, authRole("teacher"), studentCtrl.getTheLowesSocialRankStudents);
