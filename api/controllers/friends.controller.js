@@ -90,4 +90,33 @@ exports.friendCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+  updateFriends: async (req, res) => {
+    try {
+      const friendsList = req.body.friends;
+      const student = req.tokenData._id;
+
+      let stu = await FriendModel.updateOne(
+        { student: student, active: "true" },
+        { $set: { friends_list: friendsList } }
+      )
+
+      res.status(201).json(stu);
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+  checkStudent: async (req, res) => {
+ 
+    const student = req.tokenData._id;
+    let user = await FriendModel.findOne({ student: student })
+     if (!user){
+       res.json(false)
+     }
+     else{
+      res.json(true)
+     }
+     
+    
+  }
 };
