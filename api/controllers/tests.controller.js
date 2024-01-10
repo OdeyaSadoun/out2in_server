@@ -64,19 +64,6 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
 };
 
 exports.testsCtrl = {
-  // getTestsBalanceByStudentId: async (req, res) => {
-  //   const classId = req.params.classId;
-  //   const classStudents = await StudentModel.find({
-  //     class_id: classId,
-  //     active: "true",
-  //   });
-  //   const class_balance_arr = [];
-  //   for (const student of classStudents) {
-  //     let avg = await getTestsBalanceByStudentId1(student._id, classId);
-  //     class_balance_arr.push({ student_id: student._id, avg: avg });
-  //   }
-  // },
-
   getTestById: async (req, res) => {
     let { testId } = req.params;
     try {
@@ -135,50 +122,6 @@ exports.testsCtrl = {
     }
   },
 
-  // getTestsBalanceByStudentId: async (req, res) => {
-  //   const { studentId } = req.params;
-  //   let gradesSum = 0;
-  //   let student_class;
-  //   try {
-  //     const student = await StudentModel.findOne({
-  //       _id: studentId,
-  //       active: "true",
-  //     }).populate("user_id", { password: 0 });
-  //     if (!student) {
-  //       return res.status(404).json({ msg: "Student not found" });
-  //     }
-  //     student_class = await ClassModel.findOne({
-  //       _id: student.class_id,
-  //       active: "true",
-  //     }).populate("subjects_list");
-  //     if (!student_class) {
-  //       return res.status(404).json({ msg: "Class not found" });
-  //     }
-
-  //     const subjects_list = student_class.subjects_list;
-  //     await subjects_list.map(async (subject, i) => {
-  //       let last_test_id = subject.tests_list.slice(-1);
-  //       const last_test = await TestModel.findOne({
-  //         _id: last_test_id,
-  //         active: "true",
-  //       });
-  //       if (!last_test) {
-  //         return res.status(404).json({ msg: "Test not found" });
-  //       }
-  //       const student_grade = last_test.grades_list.filter((grade) => {
-  //         return String(grade.student_id) === String(studentId);
-  //       });
-  //       gradesSum += Number(student_grade[0].grade);
-  //       if (i == 0) {
-  //         res.json({ gradesAvg: gradesSum / subjects_list.length });
-  //       }
-  //     });
-  //   } catch (err) {
-  //     console.log({ msg: "err", err });
-  //   }
-  //   res.json(class_balance_arr);
-  // },
-
   addTestToSubject: async (req, res) => {
     const { subId } = req.params;
     const testId = req.body.test_id;
@@ -197,12 +140,53 @@ exports.testsCtrl = {
   addGrades: async (req, res) => {
     try {
       let newTest = new TestModel(req.body);
+      console.log(newTest);
       await newTest.save();
 
       res.status(201).json(newTest);
     } catch (err) {
       res.status(500).json({ msg: "err", err });
     }
+  },
+
+  updateGrade: async (req, res) => {
+    try {
+      const testId = req.params.id;
+      const gradeIdToUpdate = req.body.gradeId; // מזהה הציון שיש לעדכן
+      const updatedGradeValue = req.body.grade; // ערך הציון המעודכן
+
+      // בדיקה אם המשתמש שולח ציון לעדכון
+      if (!updatedGradeValue) {
+        return res.status(400).json({ error: 'Missing updated grade' });
+      }
+
+      // מציאת המבחן בדטהבייס לפי המזהה
+      const test = await TestModel.findOne({_id: testId});
+
+      // בדיקה אם המבחן נמצא
+      if (!test) {
+        return res.status(404).json({ error: 'Test not found' });
+      }
+
+      // מציאת הציון במערך grades_list לפי המזהה
+      const gradeToUpdate = test.grades_list.find(grade => grade._id.toString() === gradeIdToUpdate);
+
+      // בדיקה אם הציון נמצא
+      if (!gradeToUpdate) {
+        return res.status(404).json({ error: 'Grade not found' });
+      }
+
+      // עדכון הציון
+      gradeToUpdate.grade = updatedGradeValue;
+      await test.save();
+
+      // מחזיר תשובה במקרה של הצלחה
+      res.json({ success: true, message: 'Grade updated successfully' });
+    } catch (error) {
+      console.error('Error updating grade:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+
   },
 
   deleteTest: async (req, res) => {

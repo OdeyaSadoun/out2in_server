@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 let testSchema = new mongoose.Schema({
-
   date: Date,
   grades_list: [
     {
@@ -10,7 +9,7 @@ let testSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: "students",
       },
-      //   avg: Number
+      _id: String
     },
   ],
 

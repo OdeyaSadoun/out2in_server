@@ -3,14 +3,6 @@ const router = express.Router();
 const { auth, authRole } = require("../middleware/auth");
 const { testsCtrl } = require("../controllers/tests.controller");
 
-// router.post ('/addTest',auth,authRole(["teacher"]),testsCtrl.addTest);//grade send in body
-// router.get(
-//   "/balance/:classId",
-//   auth,
-//   authRole(["teacher"]),
-//   testsCtrl.getTestsBalanceByStudentId
-// ); //grade send in body with)
-
 router.get(
   "/:testId",
   auth,
@@ -24,18 +16,16 @@ router.get(
   authRole(["teacher", "admin"]),
   testsCtrl.getAllGradesByTestId
 );
+
 router.get(
   "/balance/:classId",
   auth,
   authRole(["teacher"]),
   testsCtrl.getTestsBalanceByClassId
 );
-router.post(
-  "/addGrades",
-  auth,
-  authRole(["teacher", "admin"]),
-  testsCtrl.addGrades
-);
+
+router.post("/addGrades", auth, authRole(["teacher"]), testsCtrl.addGrades);
+
 router.patch(
   "/deleteTest/:testId",
   auth,
@@ -43,6 +33,11 @@ router.patch(
   testsCtrl.deleteTest
 );
 
-router.post("/addGrades", auth, authRole(["teacher"]), testsCtrl.addGrades);
+router.put(
+  "/tests/grades/:id",
+  auth,
+  authRole(["teacher"]),
+  testsCtrl.updateGrades
+);
 
 module.exports = router;
