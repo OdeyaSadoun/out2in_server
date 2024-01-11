@@ -152,28 +152,34 @@ exports.testsCtrl = {
   updateGrade: async (req, res) => {
     try {
       const testId = req.params.id;
-      const gradeIdToUpdate = req.body.gradeId; // מזהה הציון שיש לעדכן
-      const updatedGradeValue = req.body.grade; // ערך הציון המעודכן
-
+      const {gradeIdToUpdate, updatedGradeValue} = req.body; 
+      console.log(testId, gradeIdToUpdate, updatedGradeValue);
       // בדיקה אם המשתמש שולח ציון לעדכון
       if (!updatedGradeValue) {
-        return res.status(400).json({ error: 'Missing updated grade' });
+        return res.status(400).json({ error: "Missing updated grade" });
       }
 
       // מציאת המבחן בדטהבייס לפי המזהה
-      const test = await TestModel.findOne({_id: testId});
+      const test = await TestModel.findOne({ _id: testId });
 
       // בדיקה אם המבחן נמצא
       if (!test) {
-        return res.status(404).json({ error: 'Test not found' });
+        return res.status(404).json({ error: "Test not found" });
       }
 
+
       // מציאת הציון במערך grades_list לפי המזהה
-      const gradeToUpdate = test.grades_list.find(grade => grade._id.toString() === gradeIdToUpdate);
+      const gradeToUpdate = test.grades_list.find(
+        async (grade) => {
+          let stud = await StudentModel.findOne({_id: grade.student_id});
+          return stud.user_id.idCard === gradeIdToUpdate}
+      );
+
+      console.log(gradeToUpdate);
 
       // בדיקה אם הציון נמצא
       if (!gradeToUpdate) {
-        return res.status(404).json({ error: 'Grade not found' });
+        return res.status(404).json({ error: "Grade not found" });
       }
 
       // עדכון הציון
@@ -181,12 +187,11 @@ exports.testsCtrl = {
       await test.save();
 
       // מחזיר תשובה במקרה של הצלחה
-      res.json({ success: true, message: 'Grade updated successfully' });
+      res.json({ success: true, message: "Grade updated successfully" });
     } catch (error) {
-      console.error('Error updating grade:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error("Error updating grade:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
   },
 
   deleteTest: async (req, res) => {

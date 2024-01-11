@@ -9,7 +9,6 @@ let testSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: "students",
       },
-      _id: String
     },
   ],
 
