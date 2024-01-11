@@ -2,6 +2,7 @@ const { ClassModel } = require("../models/classes.model");
 const { StudentModel } = require("../models/students.model");
 const { SubjectsModel } = require("../models/subjects.model");
 const { TestModel } = require("../models/tests.model");
+const { UserModel } = require("../models/users.model");
 
 const getTestsBalanceByStudentId = async (studentId, class_id) => {
   let gradesSum1 = 0;
@@ -151,48 +152,41 @@ exports.testsCtrl = {
 
   updateGrade: async (req, res) => {
     try {
-      const testId = req.params.id;
-      const {gradeIdToUpdate, updatedGradeValue} = req.body; 
-      console.log(testId, gradeIdToUpdate, updatedGradeValue);
-      // בדיקה אם המשתמש שולח ציון לעדכון
-      if (!updatedGradeValue) {
-        return res.status(400).json({ error: "Missing updated grade" });
-      }
+        const testId = req.params.id;
+        const { gradeIdToUpdate, updatedGradeValue } = req.body;
 
-      // מציאת המבחן בדטהבייס לפי המזהה
-      const test = await TestModel.findOne({ _id: testId });
+        if (!updatedGradeValue) {
+            return res.status(400).json({ error: "Missing updated grade" });
+        }
 
-      // בדיקה אם המבחן נמצא
-      if (!test) {
-        return res.status(404).json({ error: "Test not found" });
-      }
+        const test = await TestModel.findOne({ _id: testId });
 
+        if (!test) {
+            return res.status(404).json({ error: "Test not found" });
+        }
 
-      // מציאת הציון במערך grades_list לפי המזהה
-      const gradeToUpdate = test.grades_list.find(
-        async (grade) => {
-          let stud = await StudentModel.findOne({_id: grade.student_id});
-          return stud.user_id.idCard === gradeIdToUpdate}
-      );
+        let studUser = await UserModel.findOne({ idCard: gradeIdToUpdate });
+        let stud = await StudentModel.findOne({ user_id: studUser._id });
 
-      console.log(gradeToUpdate);
+        console.log(stud);
+        console.log(test.grades_list);
 
-      // בדיקה אם הציון נמצא
-      if (!gradeToUpdate) {
-        return res.status(404).json({ error: "Grade not found" });
-      }
+        const indexToUpdate = test.grades_list.findIndex(grade => grade.student_id.toString() == stud._id.toString());
 
-      // עדכון הציון
-      gradeToUpdate.grade = updatedGradeValue;
-      await test.save();
+        if (indexToUpdate === -1) {
+            return res.status(404).json({ error: "Grade not found" });
+        }
 
-      // מחזיר תשובה במקרה של הצלחה
-      res.json({ success: true, message: "Grade updated successfully" });
+        test.grades_list[indexToUpdate].grade = updatedGradeValue;
+        await test.save();
+
+        res.json({ success: true, message: "Grade updated successfully" });
     } catch (error) {
-      console.error("Error updating grade:", error);
-      res.status(500).json({ error: "Internal server error" });
+        console.error("Error updating grade:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-  },
+},
+
 
   deleteTest: async (req, res) => {
     try {
