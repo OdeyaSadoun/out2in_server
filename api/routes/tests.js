@@ -34,10 +34,10 @@ router.patch(
 );
 
 router.put(
-  "/tests/grades/:id",
+  "/grades/:id",
   auth,
   authRole(["teacher"]),
-  testsCtrl.updateGrades
+  testsCtrl.updateGrade
 );
 
 module.exports = router;
