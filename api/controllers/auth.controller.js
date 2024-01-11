@@ -90,11 +90,11 @@ exports.authCtrl = {
 
       let toSend = {
         email: user.email,
-        subject: `Hi ${user.name}, this is a message from out2in`,
-        text: `${school.name} school principal has connected you to out2in, to connect click here,
-        Login details:
-         email: ${user.email},
-         password:${user.password}`,
+        subject: `שלום ${user.name}, כניסה ל out2in`,
+        text: `מנהל בית ספר: ${school.name} חיבר אותך למערכת,
+        פרטי התחברות ראשונים:
+         תעודת זהות: ${user.idCard},
+         סיסמא:${user.password}`,
       };
       // sendEmail(toSend)
       user.password = await bcrypt.hash(user.password, 10);
@@ -152,13 +152,15 @@ exports.authCtrl = {
     try {
       let objUser = { role: "student", ...req.body.user };
       let user = new UserModel(objUser);
+
       let toSend = {
         email: user.email,
-        subject: `Hi ${user.name}, this is a message from out2in`,
-        text: `Your teacher has connected you to out2in, to connect click here,
-        Login details:
-         email: ${user.email},
-         password:${user.password}`,
+        subject: `שלום ${user.name}`,
+        text: `המורה שלך חיבר אותך למערכת,
+        פרטי התחברות ראשונים:
+         תעודת זהות: ${user.idCard},
+         סיסמא:${user.password}
+         לכניסה - http://localhost:5173/login`,
       };
       // sendEmail(toSend)
       user.password = await bcrypt.hash(user.password, 10);
@@ -252,7 +254,7 @@ exports.authCtrl = {
       res.json(err);
     }
   },
-  sendEmailFrom:async(req,res)=>{
+  sendEmailFrom: async (req, res) => {
     // console.log(req.body)
     let toSend = {
       email: req.body.email,
