@@ -1,4 +1,3 @@
-
 const { SubjectsModel } = require("../models/subjects.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
@@ -123,83 +122,44 @@ exports.subjectsCtrl = {
     }
   },
 
-  // getSubjectsByClassId: async (req, res) => {
-  //   try {
-  //     let { classId } = req.params;
-
-  //     let classObj = await ClassModel.findOne({ _id: classId });
-
-  //     let subjectsJson = await Promise.all(
-  //       classObj.subjects_list.map(async (sub) => {
-  //         const subData = await SubjectsModel.findOne({ _id: sub._id });
-
-  //         let tests = subData.tests_list.map(async (testId) => {
-  //           return await TestModel.findOne({ _id: testId });
-  //         });
-
-  //         let filterTests = await Promise.all(tests).filter(test => test.active)
-
-  //         // Filter the tests by status
-  //         // let activeTests = await Promise.all(tests);
-
-  //         subData.tests_list = filterTests;
-  //         console.log("****************************",filterTests );
-
-  //         return subData;
-  //       })
-  //     );
-  //     res.json(subjectsJson);
-  //   } catch (err) {
-  //     res.json({ msg: err });
-  //   }
-  // },
-
   getSubjectsByClassId: async (req, res) => {
     try {
       let { classId } = req.params;
 
-      let classObj = await ClassModel.findOne({ _id: classId, active: "true" });
+      let classObj = await ClassModel.findOne({ _id: classId, active: true });
       if (!classObj) {
         return res.status(404).json({ msg: "Class not found" });
       }
 
-      let subjectsJson = await Promise.all(
-        classObj.subjects_list.map(async (sub) => {
-          const subData = await SubjectsModel.findOne({
-            _id: sub._id,
-            active: "true",
-          });
-          // if (!subData) {
-          //   return res.status(404).json({ msg: "Subject not found" });
-          // }
+      let subjectsJson = [];
+      for (const sub of classObj.subjects_list) {
+        const subData = await SubjectsModel.findOne({
+          _id: sub._id,
+          active: true,
+        });
 
-          let tests = await Promise.all(
-            subData.tests_list.map(async (testId) => {
-              try {
-                const test = await TestModel.findOne({
-                  _id: testId,
-                  active: "true",
-                });
-                // if (!test) {
-                //   return res.status(404).json({ msg: "Test not found" });
-                // }
-                return test;
-                // .active ? test : null; // Filter out inactive tests
-              } catch (err) {
-                console.error("Error fetching test:", err);
-                return null; // Handle errors gracefully
-              }
-            })
-          );
-
+        if (subData) {
+          let tests = [];
+          for (const testId of subData.tests_list) {
+            try {
+              const test = await TestModel.findOne({
+                _id: testId,
+                active: true,
+              });
+              tests.push(test);
+            } catch (err) {
+              console.error("Error fetching test:", err);
+            }
+          }
           subData.tests_list = tests.filter(Boolean); // Remove null values
+          subjectsJson.push(subData);
+        }
+      }
 
-          return subData;
-        })
-      );
+      console.log(subjectsJson);
       res.json(subjectsJson);
     } catch (err) {
-      res.json({ msg: err });
+      res.status(500).json({ msg: err });
     }
   },
 
@@ -235,16 +195,14 @@ exports.subjectsCtrl = {
   },
   deleteSubjectById: async (req, res) => {
     try {
-      let id = req.params.subId
+      let id = req.params.subId;
       let sub = await SubjectsModel.updateOne(
         { _id: id, active: "true" },
         { $set: { active: false } }
       );
-      res.json(sub)
+      res.json(sub);
+    } catch (err) {
+      res.json(err);
     }
-    catch (err) {
-      res.json(err)
-    }
-
-  }
+  },
 };
