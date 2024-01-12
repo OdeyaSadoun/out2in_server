@@ -181,17 +181,23 @@ exports.subjectsCtrl = {
   },
 
   addSubjectToClass: async (req, res) => {
-    const { classId } = req.params;
-    const subjectId = req.body.subject_id;
-    let cls = await ClassModel.findOne({ _id: classId, active: "true" });
-    if (!cls) {
-      return res.status(404).json({ msg: "Class not found" });
-    }
+    try {
+      console.log("add sub to class----------------------------");
+      const { classId } = req.params;
+      const subjectId = req.body.subject_id;
+      let cls = await ClassModel.findOne({ _id: classId, active: "true" });
+      if (!cls) {
+        return res.status(404).json({ msg: "Class not found" });
+      }
 
-    let data = await ClassModel.updateOne(
-      { _id: classId, active: "true" },
-      { $push: { subjects_list: subjectId } }
-    );
+      let data = await ClassModel.updateOne(
+        { _id: classId, active: "true" },
+        { $push: { subjects_list: subjectId } }
+      );
+      res.status(200).json(cls);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
   deleteSubjectById: async (req, res) => {
     try {
@@ -202,7 +208,7 @@ exports.subjectsCtrl = {
       );
       res.json(sub);
     } catch (err) {
-      res.json(err);
+      res.status(500).json(err);
     }
   },
 };
