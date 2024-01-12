@@ -182,7 +182,6 @@ exports.subjectsCtrl = {
 
   addSubjectToClass: async (req, res) => {
     try {
-      console.log("add sub to class----------------------------");
       const { classId } = req.params;
       const subjectId = req.body.subject_id;
       let cls = await ClassModel.findOne({ _id: classId, active: "true" });
