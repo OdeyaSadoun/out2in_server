@@ -85,17 +85,18 @@ exports.userlCtrl = {
 
       let user = await UserModel.findOne({
         _id: req.tokenData._id,
-        active: "true",
+        active: true,
       });
+
       if (!user) {
-        return res.status(404).json({ msg: "User not found" });
+        return res.status(404).json({ msg: "User in the system not found (token)" });
       }
       let userUp = await UserModel.findOne({
         idCard: idDelete,
-        active: "true",
+        active: true,
       });
       if (!userUp) {
-        return res.status(404).json({ msg: "User not found" });
+        return res.status(404).json({ msg: "User to update not found" });
       }
 
       if (
