@@ -52,24 +52,46 @@ exports.studentCtrl = {
     }
   },
 
+  // getAllStudentsByClassId: async (req, res) => {
+  //   let { classId } = req.params;
+  //   try {
+  //     let students = await StudentModel.find({
+  //       class_id: classId,
+  //       active: true,
+  //     }).populate("user_id", {
+  //       password: 0,
+  //     });
+  //     if (!students) {
+  //       return res.status(404).json({ msg: "Students not found" });
+  //     }
+
+  //     console.log("students", students);
+
+  //     res.json(students);
+  //   } catch (err) {
+  //     console.log(err);
+  //     res.status(500).json({ msg: "err", err });
+  //   }
+  // },
+
   getAllStudentsByClassId: async (req, res) => {
     let { classId } = req.params;
     try {
       let students = await StudentModel.find({
         class_id: classId,
-        active: "true",
-      }).populate("user_id", {
-        password: 0,
+        active: true,
+      }).populate({
+        path: "user_id",
+        select: "-password",
+        match: { active: true }, // סינון נוסף על סטודנטים שהם active בעצמם
       });
+
       if (!students) {
         return res.status(404).json({ msg: "Students not found" });
       }
 
-      // let studentsActive = students.filter((s=>s.user_id.active==true))
+      console.log("students", students);
 
-      // let studentJson = data.filter((stud) => {
-      //   return stud.class_id == classId;
-      // });
       res.json(students);
     } catch (err) {
       console.log(err);
@@ -120,7 +142,7 @@ exports.studentCtrl = {
   },
 
   getStudentByStudentId: async (req, res) => {
-    let {studentId} = req.params;
+    let { studentId } = req.params;
     try {
       let studentInfo = await StudentModel.findOne({
         _id: studentId,
@@ -144,7 +166,7 @@ exports.studentCtrl = {
       let student = await StudentModel.findOne({
         user_id: id,
         active: "true",
-      }).populate("user_id", {password:0});
+      }).populate("user_id", { password: 0 });
       if (!student) {
         return res.status(404).json({ msg: "Student not found" });
       }
@@ -161,7 +183,7 @@ exports.studentCtrl = {
         {
           last_questionnaire_answered_date: lastDate,
         },
-        {new: true}
+        { new: true }
       );
 
       res.json(data);
