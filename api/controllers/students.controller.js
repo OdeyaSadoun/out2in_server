@@ -52,47 +52,23 @@ exports.studentCtrl = {
     }
   },
 
-  // getAllStudentsByClassId: async (req, res) => {
-  //   let { classId } = req.params;
-  //   try {
-  //     let students = await StudentModel.find({
-  //       class_id: classId,
-  //       active: true,
-  //     }).populate("user_id", {
-  //       password: 0,
-  //     });
-  //     if (!students) {
-  //       return res.status(404).json({ msg: "Students not found" });
-  //     }
-
-  //     console.log("students", students);
-
-  //     res.json(students);
-  //   } catch (err) {
-  //     console.log(err);
-  //     res.status(500).json({ msg: "err", err });
-  //   }
-  // },
-
   getAllStudentsByClassId: async (req, res) => {
     let { classId } = req.params;
     try {
       let students = await StudentModel.find({
         class_id: classId,
         active: true,
-      }).populate({
-        path: "user_id",
-        select: "-password",
-        match: { active: true }, // סינון נוסף על סטודנטים שהם active בעצמם
+      }).populate("user_id", {
+        password: 0,
       });
-
       if (!students) {
         return res.status(404).json({ msg: "Students not found" });
       }
+      let filterStudents = students.filter(student => student.user_id.active);
 
-      console.log("students", students);
+      // console.log("students", filterStudents);
 
-      res.json(students);
+      res.json(filterStudents);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
