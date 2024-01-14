@@ -39,5 +39,11 @@ router.put(
   authRole(["teacher"]),
   testsCtrl.updateGrade
 );
+router.delete(
+  "/deleteStudentGrades/:id",
+  auth,
+  authRole(["teacher"]),
+  testsCtrl.deleteGradesByStudentId
+);
 
 module.exports = router;

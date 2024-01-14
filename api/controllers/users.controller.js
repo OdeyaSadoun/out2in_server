@@ -50,6 +50,7 @@ exports.userlCtrl = {
   },
 
   editUser: async (req, res) => {
+    console.log("edit");
     let { idEdit } = req.params;
     let validBody = userValidate(req.body);
     if (validBody.error) {
@@ -193,6 +194,7 @@ exports.userlCtrl = {
       res.status(500).json({ err });
     }
   },
+
   getPrincipalsAwaitingApproval: async (req, res) => {
     try {
       let principals = await UserModel.find({ active: false, role: "principal" })

@@ -122,9 +122,8 @@ exports.studentCtrl = {
     try {
       let studentInfo = await StudentModel.findOne({
         _id: studentId,
-        active: "true",
       }).populate("user_id", { password: 0 });
-      if (!studentInfo) {
+      if (!studentInfo || !studentInfo.user_id.active) {
         return res.status(404).json({ msg: "Student not found" });
       }
       res.json(studentInfo);
