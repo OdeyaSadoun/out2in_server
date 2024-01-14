@@ -3,6 +3,7 @@ const { ClassModel } = require("../models/classes.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
+const { UserModel } = require("../models/users.model");
 
 function getPreviousMonthDate(date) {
   const today = new Date(date);
@@ -417,4 +418,45 @@ exports.classCtrl = {
       res.json(err);
     }
   },
+
+  deleteStudentAndAttendance: async (req, res) => {
+    const { studIdCard } = req.params;
+    const { classId } = req.body;
+  
+    try {
+      const user = await UserModel.findOne({ idCard: studIdCard, active: true });
+
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      // מחק את התלמיד מתוך הכיתה
+      // await ClassModel.updateOne(
+      //   { _id: classId },
+      //   { $pull: { places: { $or: [{ 'stud1': studentId }, { 'stud2': studentId }] } } }
+      // );
+  
+      // מחק את הנוכחות של התלמיד מתוך הכיתה
+      await ClassModel.updateOne(
+        { _id: classId },
+        { $pull: { attendance_list: { 'students_attendance.student_id': student._id } } }
+      );
+  
+      // מחק את התלמיד מתוך מודל התלמידים
+      await StudentModel.deleteOne({ _id: student._id });
+  
+      res.json({ success: true, message: 'Student and attendance records deleted successfully' });
+    } catch (err) {
+      console.error('Error deleting student and attendance records:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 };
