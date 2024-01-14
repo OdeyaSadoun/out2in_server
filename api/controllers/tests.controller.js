@@ -83,7 +83,7 @@ exports.testsCtrl = {
     let { testId } = req.params;
 
     try {
-      let test = await TestModel.findOne({ _id: testId, active: "true" });
+      let test = await TestModel.findOne({ _id: testId, active: true });
       if (!test) {
         return res.status(404).json({ msg: "Test not found" });
       }
