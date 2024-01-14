@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-
+const crypto = require('crypto');
 const { createToken } = require("../helpers/auth.helper");
 const { UserModel } = require("../models/users.model");
 const { PrincipalModel } = require("../models/principals.model");
@@ -11,6 +11,23 @@ const {
   registerValidate,
   loginValidate,
 } = require("../validations/auth.validation");
+
+
+const createResetToken = () => {
+  const resetToken = crypto
+    .randomBytes(32) 
+    .toString("hex"); 
+
+  passwordResetToken = crypto //saving the encrypted reset token into db
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  passwordResetExpires = Date.now() + 10 * 1000 * 60; //milliseconds 10 min
+
+  return {passwordResetToken,passwordResetExpires};
+}
+
 
 const sendEmail = (req) => {
   // Create a transporter with your SMTP configuration
@@ -268,7 +285,7 @@ exports.authCtrl = {
     const resetToken = req.params.reset_token
     const newPassword = req.body.new_password
     const confirmNewPassword = req.body.confirm_new_password
-
+    // console.log(resetToken)
     if (newPassword != confirmNewPassword) {
       return res.status(400).json('ERROR: different passwords')
     }
@@ -290,7 +307,7 @@ exports.authCtrl = {
       if (!user) {
         return res.status(400).json('ERROR: token is expired or wrong');
       }
-
+      res.json(user)
       // user.password = "********";
       // let token = createToken(user._id, user.role)
       //delete the header here???
@@ -315,12 +332,18 @@ exports.authCtrl = {
 
       if (user) {
         try {
-          sendEmail(email, 'קיבלנו את בקשתך לאיפוס סיסמה', `http://localhost:5173/reset_password/ + passwordResetToken` ,
-          `<div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+          console.log(email)
+          let toSend = {
+            email: email,
+            subject: "קיבלנו את בקשתך לאיפוס סיסמה",
+            text: `<div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
      <h3 style="color: darkblue; font-size: 20px;">קיבלנו את בקשתך לאיפוס סיסמה</h3>
      <p style="color: #343a40; font-size: 16px; line-height: 1.6;">תוכל לאפס את הסיסמה באמצעות הקישור המצורף. <br/>שים לב, הקישור תקף ל10 דקות בלבד.</p>
      <span style="color: black; font-size: 14px;"> לאיפוס הסיסמה <a href="http://localhost:5173/reset_password/${passwordResetToken}" style="color: darkblue; text-decoration: none;">לחץ כאן</a></span>
-     </div>`)
+     </div>`,
+          };
+          sendEmail(toSend)
+
         }
         catch (err) {
           return res.status(400).json("ERROR: Failure while sending reset password url");
