@@ -64,6 +64,32 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
   }
 };
 
+const deleteGradesByStudentId = async (studentId) => {
+  try {
+    console.log("deleteGradesByStudentId");
+    const tests = await TestModel.find({
+      "grades_list.student_id": studentId,
+      active: true,
+    });
+
+    for (const test of tests) {
+      const indexToRemove = test.grades_list.findIndex(
+        (grade) => String(grade.student_id) === String(studentId)
+      );
+
+      if (indexToRemove !== -1) {
+        test.grades_list.splice(indexToRemove, 1);
+        await test.save();
+      }
+    }
+
+    return { success: true, message: "Grades deleted successfully" };
+  } catch (err) {
+    console.log({ msg: "err", err });
+    return { error: "Internal server error" };
+  }
+};
+
 exports.testsCtrl = {
   getTestById: async (req, res) => {
     let { testId } = req.params;
@@ -152,41 +178,42 @@ exports.testsCtrl = {
 
   updateGrade: async (req, res) => {
     try {
-        const testId = req.params.id;
-        const { gradeIdToUpdate, updatedGradeValue } = req.body;
+      const testId = req.params.id;
+      const { gradeIdToUpdate, updatedGradeValue } = req.body;
 
-        if (!updatedGradeValue) {
-            return res.status(400).json({ error: "Missing updated grade" });
-        }
+      if (!updatedGradeValue) {
+        return res.status(400).json({ error: "Missing updated grade" });
+      }
 
-        const test = await TestModel.findOne({ _id: testId });
+      const test = await TestModel.findOne({ _id: testId });
 
-        if (!test) {
-            return res.status(404).json({ error: "Test not found" });
-        }
+      if (!test) {
+        return res.status(404).json({ error: "Test not found" });
+      }
 
-        let studUser = await UserModel.findOne({ idCard: gradeIdToUpdate });
-        let stud = await StudentModel.findOne({ user_id: studUser._id });
+      let studUser = await UserModel.findOne({ idCard: gradeIdToUpdate });
+      let stud = await StudentModel.findOne({ user_id: studUser._id });
 
-        console.log(stud);
-        console.log(test.grades_list);
+      console.log(stud);
+      console.log(test.grades_list);
 
-        const indexToUpdate = test.grades_list.findIndex(grade => grade.student_id.toString() == stud._id.toString());
+      const indexToUpdate = test.grades_list.findIndex(
+        (grade) => grade.student_id.toString() == stud._id.toString()
+      );
 
-        if (indexToUpdate === -1) {
-            return res.status(404).json({ error: "Grade not found" });
-        }
+      if (indexToUpdate === -1) {
+        return res.status(404).json({ error: "Grade not found" });
+      }
 
-        test.grades_list[indexToUpdate].grade = updatedGradeValue;
-        await test.save();
+      test.grades_list[indexToUpdate].grade = updatedGradeValue;
+      await test.save();
 
-        res.json({ success: true, message: "Grade updated successfully" });
+      res.json({ success: true, message: "Grade updated successfully" });
     } catch (error) {
-        console.error("Error updating grade:", error);
-        res.status(500).json({ error: "Internal server error" });
+      console.error("Error updating grade:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-},
-
+  },
 
   deleteTest: async (req, res) => {
     try {
@@ -205,6 +232,36 @@ exports.testsCtrl = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Error", error: err.message });
+    }
+  },
+
+  deleteGradesByStudentId: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const user = await UserModel.findOne({ idCard: id, active: true });
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+      
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      const deletedGrades = await deleteGradesByStudentId(student._id);
+      if (deletedGrades.error) {
+        return res.status(500).json(deletedGrades);
+      }
+
+      res.json({
+        success: true,
+        message: "Student grades deleted successfully",
+      });
+    } catch (err) {
+      console.log({ msg: "err", err });
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 };
