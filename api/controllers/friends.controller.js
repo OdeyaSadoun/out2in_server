@@ -11,13 +11,14 @@ exports.friendCtrl = {
 
       let student = await StudentModel.find({
         class_id: classId,
-        active: "true",
-      });
+      }).populate("user_id", {password: 0});
       if (!student) {
         return res.status(404).json({ msg: "Student not found" });
       }
 
-      let friendsJsonID = student.map((f) => String(f.user_id));
+      let filterStudents = student.filter(item => item.user_id.active);
+
+      let friendsJsonID = filterStudents.map((f) => String(f.user_id));
 
       let data = await FriendModel.find({ active: "true" });
       if (!data) {
@@ -137,10 +138,18 @@ exports.friendCtrl = {
         return res.status(404).json({ msg: "student not found" });
       }
 
+      console.log("friendssss student", student);
       await FriendModel.updateOne(
         { student: student._id, active: true },
         { $set: { active: false } }
       );
+
+      await FriendModel.updateMany(
+        { 'students_list.student_id': student._id },
+        { $set: { 'students_list.$.student_id': null } }
+      );
+
+      console.log("friendssss student finish");
 
       res.json({
         success: true,

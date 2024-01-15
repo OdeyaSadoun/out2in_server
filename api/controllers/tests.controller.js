@@ -66,7 +66,6 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
 
 const deleteGradesByStudentId = async (studentId) => {
   try {
-    console.log("deleteGradesByStudentId");
     const tests = await TestModel.find({
       "grades_list.student_id": studentId,
       active: true,
@@ -133,8 +132,10 @@ exports.testsCtrl = {
         return res.status(404).json({ msg: "Students not found" });
       }
 
+      let filterStudents = students.filter(item => item.user_id.active);
+
       const arr_balance = [];
-      for (const student of students) {
+      for (const student of filterStudents) {
         let studBalance = await getTestsBalanceByStudentId(
           student._id,
           classId

@@ -57,6 +57,12 @@ router.patch(
     authRole(["admin", "teacher", "student"]),
     messagesCtrl.updateImportantInMessage
   );
+router.patch(
+    "/deleteStudentMessages/:studIdCard",
+    auth,
+    authRole(["admin", "teacher"]),
+    messagesCtrl.deleteStudentMessages
+  );
   
 
 module.exports = router;

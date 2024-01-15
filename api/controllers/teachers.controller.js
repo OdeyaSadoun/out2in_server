@@ -22,7 +22,7 @@ exports.teacherlCtrl = {
   },
 
   getTeacherById: async (req, res) => {
-    let {idCard} = req.body;
+    let {id} = req.body;
     try {
       let teacher = await TeacherModel.findOne({
         user_id: id,
