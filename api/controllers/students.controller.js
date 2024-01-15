@@ -56,8 +56,7 @@ exports.studentCtrl = {
     let { classId } = req.params;
     try {
       let students = await StudentModel.find({
-        class_id: classId,
-        active: true,
+        class_id: classId
       }).populate("user_id", {
         password: 0,
       });

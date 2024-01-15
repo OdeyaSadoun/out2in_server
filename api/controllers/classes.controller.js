@@ -3,6 +3,7 @@ const { ClassModel } = require("../models/classes.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
+const { UserModel } = require("../models/users.model");
 
 function getPreviousMonthDate(date) {
   const today = new Date(date);
@@ -316,6 +317,15 @@ exports.classCtrl = {
         return res.status(404).json({ error: "Class not found" });
       }
 
+      let students = await StudentModel.find({
+        class_id: classId
+      }).populate("user_id", {
+        password: 0,
+      });
+      let filterStudents = students.filter(student => student.user_id.active);
+      let filterStudentsID = filterStudents.map(student => String(student.user_id._id));
+      // console.log(filterStudentsID)
+
       let year = fullDate1.getFullYear();
       let month = fullDate1.getMonth();
 
@@ -335,22 +345,26 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year == yearE && month == monthE;
       });
-      // if (attendanceEntry1.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days1 = attendanceEntry1.length;
       attendanceEntry1.forEach((item) => {
-        item.students_attendance.forEach((stu) => {
-          if (studentMap1.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap1.set(
-                String(stu.student_id),
-                studentMap1.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap1.set(String(stu.student_id), 1);
-            else studentMap1.set(String(stu.student_id), 0);
+        item.students_attendance.forEach(async (stu) => {
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap1.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap1.set(
+                  String(stu.student_id),
+                  studentMap1.get(String(stu.student_id)) + 1
+                );
+            } else {
+
+              if (stu.present) {
+                studentMap1.set(String(stu.student_id), 1)
+                  ;
+              }
+              else studentMap1.set(String(stu.student_id), 0);
+            }
           }
+
         });
       });
       //-----2
@@ -360,21 +374,20 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year2 == yearE && month2 == monthE;
       });
-      // if (attendanceEntry2.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days2 = attendanceEntry2.length;
       attendanceEntry2.forEach((item) => {
         item.students_attendance.forEach((stu) => {
-          if (studentMap2.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap2.set(
-                String(stu.student_id),
-                studentMap2.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap2.set(String(stu.student_id), 1);
-            else studentMap2.set(String(stu.student_id), 0);
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap2.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap2.set(
+                  String(stu.student_id),
+                  studentMap2.get(String(stu.student_id)) + 1
+                );
+            } else {
+              if (stu.present) studentMap2.set(String(stu.student_id), 1);
+              else studentMap2.set(String(stu.student_id), 0);
+            }
           }
         });
       });
@@ -385,22 +398,22 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year3 == yearE && month3 == monthE;
       });
-      // if (attendanceEntry3.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days3 = attendanceEntry3.length;
       attendanceEntry3.forEach((item) => {
         item.students_attendance.forEach((stu) => {
-          if (studentMap3.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap3.set(
-                String(stu.student_id),
-                studentMap3.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap3.set(String(stu.student_id), 1);
-            else studentMap3.set(String(stu.student_id), 0);
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap3.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap3.set(
+                  String(stu.student_id),
+                  studentMap3.get(String(stu.student_id)) + 1
+                );
+            } else {
+              if (stu.present) studentMap3.set(String(stu.student_id), 1);
+              else studentMap3.set(String(stu.student_id), 0);
+            }
           }
+
         });
       });
       let arrStudents = [];

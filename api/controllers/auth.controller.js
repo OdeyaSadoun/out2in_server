@@ -12,7 +12,6 @@ const {
   loginValidate,
 } = require("../validations/auth.validation");
 
-
 const createResetToken = () => {
   const resetToken = crypto
     .randomBytes(32) 
