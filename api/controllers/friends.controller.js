@@ -2,6 +2,7 @@
 const { default: axios } = require("axios");
 const { FriendModel } = require("../models/friends.model");
 const { StudentModel } = require("../models/students.model");
+const { UserModel } = require("../models/users.model");
 
 exports.friendCtrl = {
   getFriendsList: async (req, res) => {
@@ -10,13 +11,14 @@ exports.friendCtrl = {
 
       let student = await StudentModel.find({
         class_id: classId,
-        active: "true",
-      });
+      }).populate("user_id", {password: 0});
       if (!student) {
         return res.status(404).json({ msg: "Student not found" });
       }
 
-      let friendsJsonID = student.map((f) => String(f.user_id));
+      let filterStudents = student.filter(item => item.user_id.active);
+
+      let friendsJsonID = filterStudents.map((f) => String(f.user_id));
 
       let data = await FriendModel.find({ active: "true" });
       if (!data) {
@@ -90,6 +92,7 @@ exports.friendCtrl = {
       res.status(500).json({ msg: "err", err });
     }
   },
+
   updateFriends: async (req, res) => {
     try {
       const friendsList = req.body.friends;
@@ -98,7 +101,7 @@ exports.friendCtrl = {
       let stu = await FriendModel.updateOne(
         { student: student, active: "true" },
         { $set: { friends_list: friendsList } }
-      )
+      );
 
       res.status(201).json(stu);
     } catch (error) {
@@ -106,17 +109,55 @@ exports.friendCtrl = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
   checkStudent: async (req, res) => {
- 
     const student = req.tokenData._id;
-    let user = await FriendModel.findOne({ student: student })
-     if (!user){
-       res.json(false)
-     }
-     else{
-      res.json(true)
-     }
-     
-    
-  }
+    let user = await FriendModel.findOne({ student: student });
+    if (!user) {
+      res.json(false);
+    } else {
+      res.json(true);
+    }
+  },
+
+  deleteStudentAndSurveys: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const user = await UserModel.findOne({ idCard: id, active: true });
+
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      console.log("friendssss student", student);
+      await FriendModel.updateOne(
+        { student: student._id, active: true },
+        { $set: { active: false } }
+      );
+
+      await FriendModel.updateMany(
+        { 'students_list.student_id': student._id },
+        { $set: { 'students_list.$.student_id': null } }
+      );
+
+      console.log("friendssss student finish");
+
+      res.json({
+        success: true,
+        message: "Student and surveys deleted successfully",
+      });
+    } catch (err) {
+      console.error("Error deleting student and surveys:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
 };

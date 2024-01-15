@@ -249,8 +249,10 @@ exports.messagesCtrl = {
       if (!studentsClass || studentsClass.length === 0) {
         return res.status(404).json("Students in this class not found");
       }
+      let filterStudents = studentsClass.filter(item => item.user_id.active);
 
-      const studentIds = studentsClass.map((student) => student._id.toString());
+
+      const studentIds = filterStudents.map((student) => student._id.toString());
 
       // Find important messages sent in the last month
       const lastMonth = new Date();
@@ -266,7 +268,7 @@ exports.messagesCtrl = {
         active: true,
       });
 
-      const studentsWithImportantMessages = studentsClass.map((student) => {
+      const studentsWithImportantMessages = filterStudents.map((student) => {
         // Check if the student sent an important message in the last month
         const hasImportantMessage = importantMessages.some((message) =>
           message.student_id.equals(student._id)
@@ -281,6 +283,47 @@ exports.messagesCtrl = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Error", error: err.message });
+    }
+  },
+
+  deleteStudentMessages: async (req, res) => {
+    const { studIdCard } = req.params;
+    console.log("deleteStudentMessages");
+
+    try {
+      const user = await UserModel.findOne({
+        idCard: studIdCard,
+        active: true,
+      });
+
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+
+      console.log("user", user);
+
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      console.log("student", student);
+      // מחק את כל ההודעות הקשורות לתלמיד
+      await MessageModel.updateMany(
+        { student: student._id, active: true },
+        { $set: { active: false } }
+      );
+      console.log("999999");
+      res.json({
+        success: true,
+        message: "Student messages deleted successfully",
+      });
+    } catch (err) {
+      console.error("Error deleting student messages:", err);
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 };
