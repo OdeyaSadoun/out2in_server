@@ -3,36 +3,103 @@ const { default: axios } = require("axios");
 const { FriendModel } = require("../models/friends.model");
 const { StudentModel } = require("../models/students.model");
 const { UserModel } = require("../models/users.model");
+const { ObjectId } = require('mongoose');
+
 
 exports.friendCtrl = {
   getFriendsList: async (req, res) => {
     try {
-      let { classId } = req.params;
+        let { classId } = req.params;
 
-      let student = await StudentModel.find({
-        class_id: classId,
-      }).populate("user_id", {password: 0});
-      if (!student) {
-        return res.status(404).json({ msg: "Student not found" });
-      }
+        let student = await StudentModel.find({
+            class_id: classId,
+        }).populate("user_id", {password: 0});
+        if (!student) {
+            return res.status(404).json({ msg: "Student not found" });
+        }
+        console.log(1);
 
-      let filterStudents = student.filter(item => item.user_id.active);
+        let filterStudents = student.filter((student) => student.user_id.active);
+        console.log(2);
 
-      let friendsJsonID = filterStudents.map((f) => String(f.user_id));
+        // Use `pluck()` to get the student IDs
+        let friendsJsonID = filterStudents.map(student => student.user_id._id );
+        console.log(3, friendsJsonID);
 
-      let data = await FriendModel.find({ active: "true" });
-      if (!data) {
-        return res.status(404).json({ msg: "Friends not found" });
-      }
-      let friendsByClass = data.filter((fr) => {
-        return friendsJsonID.includes(String(fr.student));
-      });
-      res.json(friendsByClass);
-    } catch (error) {
-      console.log(err);
-      res.status(500).json({ msg: "err", err });
+        let friendsByClass = await FriendModel.find({ active: "true" });
+        console.log(4, friendsByClass);
+        let filterdata = friendsByClass.filter((friend) => 
+        // friend.student
+        friendsJsonID.includes((friend.student)));
+        console.log(5, filterdata);
+
+        res.json(friendsByClass);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "err", err });
     }
-  },
+},
+
+
+  // getFriendsList: async (req, res) => {
+  //   try {
+  //     let { classId } = req.params;
+
+  //     let student = await StudentModel.find({
+  //       class_id: classId,
+  //     }).populate("user_id", {password: 0});
+  //     if (!student) {
+  //       return res.status(404).json({ msg: "Student not found" });
+  //     }
+  //     let filterStudents = student.filter(item => item.user_id.active);
+
+  //     let friendsJsonID = filterStudents.map((f) => String(f.user_id));
+  //     console.log(friendsJsonID);
+  //     let data = await FriendModel.find({ active: "true" });
+  //     if (!data) {
+  //       return res.status(404).json({ msg: "Friends not found" });
+  //     }
+  //     if(friendsJsonID.includes("65a6898636efcaf9b0bc78f9")){
+  //       console.log("65a6898636efcaf9b0bc78f9- work includes");
+  //     }
+  //     else{
+  //       console.log("not work");
+  //     }
+  //     console.log("data", data);
+  //     let friendsByClass = data.filter((fr) => {
+  //       let studentIdString = String(fr.student);
+  //       console.log(studentIdString);
+  //       return friendsJsonID.includes(studentIdString);
+  //   });
+  //     console.log(friendsByClass);
+  //     res.json(friendsByClass);
+  //   } catch (error) {
+  //     console.log(err);
+  //     res.status(500).json({ msg: "err", err });
+  //   }
+  // },
+  // getFriendsList: async (req, res) => {
+  //   try {
+  //     const { classId } = req.params;
+
+  //     // שאילתת MongoDB המביאה את כל התלמידים הפעילים בכיתה
+  //     const activeStudents = await StudentModel.find({
+  //       class_id: classId,
+  //       "user_id.active": true,
+  //     });
+
+  //     // מביאים את רשימת החברים הפעילים
+  //     const friendsList = await FriendModel.find({
+  //       active: true,
+  //       student: { $in: activeStudents.map((student) => student.user_id) },
+  //     });
+  //     console.log("friendsList", friendsList);
+  //     res.json(friendsList);
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ msg: "Internal Server Error", error });
+  //   }
+  // },
 
   addNewQuestionnaireAnswer: async (req, res) => {
     try {
@@ -145,8 +212,8 @@ exports.friendCtrl = {
       );
 
       await FriendModel.updateMany(
-        { 'students_list.student_id': student._id },
-        { $set: { 'students_list.$.student_id': null } }
+        { "students_list.student_id": student._id },
+        { $set: { "students_list.$.student_id": null } }
       );
 
       console.log("friendssss student finish");
