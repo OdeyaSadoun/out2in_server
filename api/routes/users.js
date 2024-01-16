@@ -25,7 +25,7 @@ router.patch("/delete/",auth, authRole(["admin", "teacher", "principal"]),userlC
 
 
 
-// router.patch("/changePassword", auth, authCtrl.changePassword);
+router.patch("/changePassword", auth, authCtrl.changePassword);
 router.patch("/reset_password/:reset_token", authCtrl.resetPassword);
 router.patch("/forgot_password", authCtrl.forgotPassword);
 
