@@ -227,8 +227,8 @@ exports.authCtrl = {
 
   changePassword: async (req, res) => {
     try {
+      console.log(req.body.newPassword);
       let pass = await bcrypt.hash(req.body.newPassword, 10);
-      console.log(pass);
       let data = await UserModel.updateOne(
         { _id: req.tokenData._id, active: "true" },
         { $set: { password: pass } }
@@ -252,7 +252,7 @@ exports.authCtrl = {
       res.json(err);
     }
   },
-  sendEmailFrom:async(req,res)=>{
+  sendEmailFrom: async (req, res) => {
     // console.log(req.body)
     let toSend = {
       email: req.body.email,

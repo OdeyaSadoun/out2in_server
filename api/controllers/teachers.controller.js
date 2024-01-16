@@ -22,7 +22,7 @@ exports.teacherlCtrl = {
   },
 
   getTeacherById: async (req, res) => {
-    let {idCard} = req.body;
+    let { idCard } = req.body;
     try {
       let teacher = await TeacherModel.findOne({
         user_id: id,
@@ -150,7 +150,7 @@ exports.teacherlCtrl = {
       return res.status(404).json({ msg: "User not found" });
     }
     let userUp = await UserModel.findOne({ idCard: idEdit, active: "true" });
-    if (!userUp) {
+      if (!userUp) {
       return res.status(404).json({ msg: "User to update not found" });
     }
     // let validBody = userValidate(req.body);
@@ -160,7 +160,7 @@ exports.teacherlCtrl = {
     try {
       let data;
       if (
-        (req.tokenData.role == "admin" || idEdit == user.idCard) &&
+        (req.tokenData.role == "admin" || req.tokenData.role == "principal"  || idEdit == user.idCard) &&
         userUp.role == "teacher"
       ) {
         req.body.user.password = await bcrypt.hash(req.body.user.password, 10);
@@ -168,21 +168,19 @@ exports.teacherlCtrl = {
           { idCard: idEdit, active: "true" },
           req.body.user
         );
+
         let teacher = await TeacherModel.updateOne(
-          { user_id: userUp._id, active: "true" },
+          { user_id: userUp._id },
           req.body.other
         );
+        console.log(444,teacher);
         data = {
           updateUser: data.modifiedCount,
           updateTeacher: teacher.modifiedCount,
         };
       } else {
-        data = [
-          {
-            status: "failed",
-            msg: "You are trying to do an operation that is not enabled!",
-          },
-        ];
+
+        res.status(503).json({ msg: "You are trying to do an operation that is not enabled!" });
       }
       res.json(data);
     } catch (err) {
