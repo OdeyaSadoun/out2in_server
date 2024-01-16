@@ -85,7 +85,9 @@ exports.teacherlCtrl = {
       if (!data) {
         return res.status(404).json({ msg: "Teacher not found" });
       }
-      let teachersByClass = data.filter((teacher) =>
+
+      let filterData = data.filter(item => item.user_id.active);
+      let teachersByClass = filterData.filter((teacher) =>
         teacher.classes_list.includes(student.class_id)
       );
       res.json(teachersByClass);
