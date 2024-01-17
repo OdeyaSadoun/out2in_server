@@ -13,7 +13,7 @@ router.get(
 router.post(
   "/:studentId",
   auth,
-  authRole(["admin", "student"]),
+  authRole(["admin", "student","principal"]),
   messagesCtrl.sendMessageToTeacher
 );
 
@@ -28,26 +28,26 @@ router.post(
 router.patch(
   "/deleteMessage/:messageId",
   auth,
-  authRole(["admin", "teacher"]),
+  authRole(["admin", "teacher","principal"]),
   messagesCtrl.deleteMessage
 );
 
 router.patch(
   "/readMessage/:messageId",
   auth,
-  authRole(["admin", "teacher"]),
+  authRole(["admin", "teacher","principal"]),
   messagesCtrl.readMessage
 );
 router.get(
     "/checkMessage/:messageId",
     auth,
-    authRole(["admin", "teacher", "student"]),
+    authRole(["admin", "teacher", "student","principal"]),
     messagesCtrl.checkMessage
   );
   router.get(
     "/getStudentListThatSendImportanteMessageByClassId/:classId",
     auth,
-    authRole(["teacher", "admin"]),
+    authRole(["teacher", "admin","principal"]),
     messagesCtrl.getStudentListThatSendImportanteMessageByClassId
   );
   

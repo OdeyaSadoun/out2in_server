@@ -20,11 +20,11 @@ router.get(
 router.get(
   "/balance/:classId",
   auth,
-  authRole(["teacher"]),
+  authRole(["teacher","principal"]),
   testsCtrl.getTestsBalanceByClassId
 );
 
-router.post("/addGrades", auth, authRole(["teacher"]), testsCtrl.addGrades);
+router.post("/addGrades", auth, authRole(["teacher","principal"]), testsCtrl.addGrades);
 
 router.patch(
   "/deleteTest/:testId",

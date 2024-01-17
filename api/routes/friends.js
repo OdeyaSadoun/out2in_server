@@ -11,13 +11,8 @@ router.post(
   friendCtrl.addNewQuestionnaireAnswer
 );
 router.get("/checkStudent", auth, friendCtrl.checkStudent);
-router.get("/:classId", auth, authRole("teacher"), friendCtrl.getFriendsList); //to do check that this teacher connect to this class
-router.post(
-  "/calcSocialIndexStudentsByQuestionnaire",
-  auth,
-  authRole("teacher"),
-  friendCtrl.calcSocialIndexStudentsByQuestionnaire
-); //to do check that this teacher connect to this class
+router.get("/:classId", auth, authRole("teacher,principal"), friendCtrl.getFriendsList); //to do check that this teacher connect to this class
+router.post("/calcSocialIndexStudentsByQuestionnaire",auth,authRole("teacher,principal"),friendCtrl.calcSocialIndexStudentsByQuestionnaire); //to do check that this teacher connect to this class
 router.patch("/updateFriends", auth, friendCtrl.updateFriends);
 router.patch(
   "/deleteStudentAndSurveys/:id",
