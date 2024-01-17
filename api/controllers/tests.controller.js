@@ -2,6 +2,7 @@ const { ClassModel } = require("../models/classes.model");
 const { StudentModel } = require("../models/students.model");
 const { SubjectsModel } = require("../models/subjects.model");
 const { TestModel } = require("../models/tests.model");
+const { UserModel } = require("../models/users.model");
 
 const getTestsBalanceByStudentId = async (studentId, class_id) => {
   let gradesSum1 = 0;
@@ -63,20 +64,32 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
   }
 };
 
-exports.testsCtrl = {
-  // getTestsBalanceByStudentId: async (req, res) => {
-  //   const classId = req.params.classId;
-  //   const classStudents = await StudentModel.find({
-  //     class_id: classId,
-  //     active: "true",
-  //   });
-  //   const class_balance_arr = [];
-  //   for (const student of classStudents) {
-  //     let avg = await getTestsBalanceByStudentId1(student._id, classId);
-  //     class_balance_arr.push({ student_id: student._id, avg: avg });
-  //   }
-  // },
+const deleteGradesByStudentId = async (studentId) => {
+  try {
+    const tests = await TestModel.find({
+      "grades_list.student_id": studentId,
+      active: true,
+    });
 
+    for (const test of tests) {
+      const indexToRemove = test.grades_list.findIndex(
+        (grade) => String(grade.student_id) === String(studentId)
+      );
+
+      if (indexToRemove !== -1) {
+        test.grades_list.splice(indexToRemove, 1);
+        await test.save();
+      }
+    }
+
+    return { success: true, message: "Grades deleted successfully" };
+  } catch (err) {
+    console.log({ msg: "err", err });
+    return { error: "Internal server error" };
+  }
+};
+
+exports.testsCtrl = {
   getTestById: async (req, res) => {
     let { testId } = req.params;
     try {
@@ -95,7 +108,7 @@ exports.testsCtrl = {
     let { testId } = req.params;
 
     try {
-      let test = await TestModel.findOne({ _id: testId, active: "true" });
+      let test = await TestModel.findOne({ _id: testId, active: true });
       if (!test) {
         return res.status(404).json({ msg: "Test not found" });
       }
@@ -119,8 +132,10 @@ exports.testsCtrl = {
         return res.status(404).json({ msg: "Students not found" });
       }
 
+      let filterStudents = students.filter(item => item.user_id.active);
+
       const arr_balance = [];
-      for (const student of students) {
+      for (const student of filterStudents) {
         let studBalance = await getTestsBalanceByStudentId(
           student._id,
           classId
@@ -134,50 +149,6 @@ exports.testsCtrl = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
-
-  // getTestsBalanceByStudentId: async (req, res) => {
-  //   const { studentId } = req.params;
-  //   let gradesSum = 0;
-  //   let student_class;
-  //   try {
-  //     const student = await StudentModel.findOne({
-  //       _id: studentId,
-  //       active: "true",
-  //     }).populate("user_id", { password: 0 });
-  //     if (!student) {
-  //       return res.status(404).json({ msg: "Student not found" });
-  //     }
-  //     student_class = await ClassModel.findOne({
-  //       _id: student.class_id,
-  //       active: "true",
-  //     }).populate("subjects_list");
-  //     if (!student_class) {
-  //       return res.status(404).json({ msg: "Class not found" });
-  //     }
-
-  //     const subjects_list = student_class.subjects_list;
-  //     await subjects_list.map(async (subject, i) => {
-  //       let last_test_id = subject.tests_list.slice(-1);
-  //       const last_test = await TestModel.findOne({
-  //         _id: last_test_id,
-  //         active: "true",
-  //       });
-  //       if (!last_test) {
-  //         return res.status(404).json({ msg: "Test not found" });
-  //       }
-  //       const student_grade = last_test.grades_list.filter((grade) => {
-  //         return String(grade.student_id) === String(studentId);
-  //       });
-  //       gradesSum += Number(student_grade[0].grade);
-  //       if (i == 0) {
-  //         res.json({ gradesAvg: gradesSum / subjects_list.length });
-  //       }
-  //     });
-  //   } catch (err) {
-  //     console.log({ msg: "err", err });
-  //   }
-  //   res.json(class_balance_arr);
-  // },
 
   addTestToSubject: async (req, res) => {
     const { subId } = req.params;
@@ -197,11 +168,51 @@ exports.testsCtrl = {
   addGrades: async (req, res) => {
     try {
       let newTest = new TestModel(req.body);
+      console.log(newTest);
       await newTest.save();
 
       res.status(201).json(newTest);
     } catch (err) {
       res.status(500).json({ msg: "err", err });
+    }
+  },
+
+  updateGrade: async (req, res) => {
+    try {
+      const testId = req.params.id;
+      const { gradeIdToUpdate, updatedGradeValue } = req.body;
+
+      if (!updatedGradeValue) {
+        return res.status(400).json({ error: "Missing updated grade" });
+      }
+
+      const test = await TestModel.findOne({ _id: testId });
+
+      if (!test) {
+        return res.status(404).json({ error: "Test not found" });
+      }
+
+      let studUser = await UserModel.findOne({ idCard: gradeIdToUpdate });
+      let stud = await StudentModel.findOne({ user_id: studUser._id });
+
+      console.log(stud);
+      console.log(test.grades_list);
+
+      const indexToUpdate = test.grades_list.findIndex(
+        (grade) => grade.student_id.toString() == stud._id.toString()
+      );
+
+      if (indexToUpdate === -1) {
+        return res.status(404).json({ error: "Grade not found" });
+      }
+
+      test.grades_list[indexToUpdate].grade = updatedGradeValue;
+      await test.save();
+
+      res.json({ success: true, message: "Grade updated successfully" });
+    } catch (error) {
+      console.error("Error updating grade:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 
@@ -222,6 +233,36 @@ exports.testsCtrl = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: "Error", error: err.message });
+    }
+  },
+
+  deleteGradesByStudentId: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const user = await UserModel.findOne({ idCard: id, active: true });
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+      
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      const deletedGrades = await deleteGradesByStudentId(student._id);
+      if (deletedGrades.error) {
+        return res.status(500).json(deletedGrades);
+      }
+
+      res.json({
+        success: true,
+        message: "Student grades deleted successfully",
+      });
+    } catch (err) {
+      console.log({ msg: "err", err });
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 };

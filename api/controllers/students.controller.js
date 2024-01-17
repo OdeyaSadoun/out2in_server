@@ -56,21 +56,18 @@ exports.studentCtrl = {
     let { classId } = req.params;
     try {
       let students = await StudentModel.find({
-        class_id: classId,
-        active: "true",
+        class_id: classId
       }).populate("user_id", {
         password: 0,
       });
       if (!students) {
         return res.status(404).json({ msg: "Students not found" });
       }
+      let filterStudents = students.filter(student => student.user_id.active);
 
-      // let studentsActive = students.filter((s=>s.user_id.active==true))
+      // console.log("students", filterStudents);
 
-      // let studentJson = data.filter((stud) => {
-      //   return stud.class_id == classId;
-      // });
-      res.json(students);
+      res.json(filterStudents);
     } catch (err) {
       console.log(err);
       res.status(500).json({ msg: "err", err });
@@ -103,16 +100,29 @@ exports.studentCtrl = {
   },
 
   getStudentById: async (req, res) => {
-    // if (!req.body.active && req.body.active != false) {
-    //   return res.status(400).json({ msg: "Need to send active in body" });
-    // }
-    let student_id = req.params.id;
+    let id = req.params.id;
     try {
       let studentInfo = await StudentModel.findOne({
-        user_id: student_id,
+        user_id: id,
         active: "true",
       }).populate("user_id", { password: 0 });
       if (!studentInfo) {
+        return res.status(404).json({ msg: "Student not found" });
+      }
+      res.json(studentInfo);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "err", err });
+    }
+  },
+
+  getStudentByStudentId: async (req, res) => {
+    let { studentId } = req.params;
+    try {
+      let studentInfo = await StudentModel.findOne({
+        _id: studentId,
+      }).populate("user_id", { password: 0 });
+      if (!studentInfo || !studentInfo.user_id.active) {
         return res.status(404).json({ msg: "Student not found" });
       }
       res.json(studentInfo);
@@ -130,7 +140,7 @@ exports.studentCtrl = {
       let student = await StudentModel.findOne({
         user_id: id,
         active: "true",
-      }).populate("user_id", {password:0});
+      }).populate("user_id", { password: 0 });
       if (!student) {
         return res.status(404).json({ msg: "Student not found" });
       }
@@ -147,7 +157,7 @@ exports.studentCtrl = {
         {
           last_questionnaire_answered_date: lastDate,
         },
-        {new: true}
+        { new: true }
       );
 
       res.json(data);

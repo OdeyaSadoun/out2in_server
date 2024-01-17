@@ -32,4 +32,6 @@ router.put("/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.up
 
 router.put("/delete/:id",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteClass);
 
+router.patch("/deleteStudentAndAttendance/:studIdCard",auth, authRole(["admin","principal", "teacher"]), classCtrl.deleteStudentAndAttendance);
+
 module.exports = router;

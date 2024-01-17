@@ -21,9 +21,13 @@ router.post("/sendEmail", authCtrl.sendEmailFrom);
 
 router.put("/edit/:idEdit", auth, userlCtrl.editUser);
 
-router.patch("/delete/",auth,authRole(["admin", "teacher", "principal"]),userlCtrl.deleteUser);
+router.patch("/delete/",auth, authRole(["admin", "teacher", "principal"]),userlCtrl.deleteUser);
+
+
 
 router.patch("/changePassword", auth, authCtrl.changePassword);
+router.patch("/reset_password/:reset_token", authCtrl.resetPassword);
+router.patch("/forgot_password", authCtrl.forgotPassword);
 
 router.patch("/active/:id", authCtrl.activeTrue);
 

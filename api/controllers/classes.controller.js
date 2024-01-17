@@ -3,6 +3,7 @@ const { ClassModel } = require("../models/classes.model");
 const { SchoolsModel } = require("../models/schools.model");
 const { StudentModel } = require("../models/students.model");
 const { TeacherModel } = require("../models/teachers.model");
+const { UserModel } = require("../models/users.model");
 
 function getPreviousMonthDate(date) {
   const today = new Date(date);
@@ -304,6 +305,125 @@ exports.classCtrl = {
     return res.json(attendanceEntry[0]);
   },
 
+  // getMapsByDateAndClass: async (req, res) => {
+  //   try {
+  //     const { classId, date } = req.body;
+  //     let fullDate1 = new Date(date);
+  //     let fullDate2 = getPreviousMonthDate(fullDate1);
+  //     let fullDate3 = getPreviousMonthDate(fullDate2);
+
+  //     const class1 = await ClassModel.findOne({ _id: classId, active: true });
+  //     if (!class1) {
+  //       return res.status(404).json({ error: "Class not found" });
+  //     }
+
+  //     let year = fullDate1.getFullYear();
+  //     let month = fullDate1.getMonth();
+
+  //     let year2 = fullDate2.getFullYear();
+  //     let month2 = fullDate2.getMonth();
+
+  //     let year3 = fullDate3.getFullYear();
+  //     let month3 = fullDate3.getMonth();
+
+  //     // פילטור לסטודנטים האקטיביים
+  //     let students = await StudentModel.find({
+  //       class_id: classId,
+  //       active: true,
+  //     }).populate("user_id", { active: 1 });
+
+  //     students = students.filter((item) => item.user_id.active);
+
+  //     let studentMap1 = new Map();
+  //     let studentMap2 = new Map();
+  //     let studentMap3 = new Map();
+
+  //     //----1
+  //     const attendanceEntry1 = class1.attendance_list.filter((entry) => {
+  //       let fullDateE = new Date(entry.date);
+  //       let yearE = fullDateE.getFullYear();
+  //       let monthE = fullDateE.getMonth();
+  //       return year == yearE && month == monthE;
+  //     });
+
+  //     let days1 = attendanceEntry1.length;
+  //     attendanceEntry1.forEach((item) => {
+  //       item.students_attendance.forEach((stu) => {
+  //         if (studentMap1.has(String(stu.student_id))) {
+  //           if (stu.present)
+  //             studentMap1.set(
+  //               String(stu.student_id),
+  //               studentMap1.get(String(stu.student_id)) + 1
+  //             );
+  //         } else {
+  //           if (stu.present) studentMap1.set(String(stu.student_id), 1);
+  //           else studentMap1.set(String(stu.student_id), 0);
+  //         }
+  //       });
+  //     });
+
+  //     //-----2
+  //     const attendanceEntry2 = class1.attendance_list.filter((entry) => {
+  //       let fullDateE = new Date(entry.date);
+  //       let yearE = fullDateE.getFullYear();
+  //       let monthE = fullDateE.getMonth();
+  //       return year2 == yearE && month2 == monthE;
+  //     });
+
+  //     let days2 = attendanceEntry2.length;
+  //     attendanceEntry2.forEach((item) => {
+  //       item.students_attendance.forEach((stu) => {
+  //         if (studentMap2.has(String(stu.student_id))) {
+  //           if (stu.present)
+  //             studentMap2.set(
+  //               String(stu.student_id),
+  //               studentMap2.get(String(stu.student_id)) + 1
+  //             );
+  //         } else {
+  //           if (stu.present) studentMap2.set(String(stu.student_id), 1);
+  //           else studentMap2.set(String(stu.student_id), 0);
+  //         }
+  //       });
+  //     });
+
+  //     //-----3
+  //     const attendanceEntry3 = class1.attendance_list.filter((entry) => {
+  //       let fullDateE = new Date(entry.date);
+  //       let yearE = fullDateE.getFullYear();
+  //       let monthE = fullDateE.getMonth();
+  //       return year3 == yearE && month3 == monthE;
+  //     });
+
+  //     let days3 = attendanceEntry3.length;
+  //     attendanceEntry3.forEach((item) => {
+  //       item.students_attendance.forEach((stu) => {
+  //         if (studentMap3.has(String(stu.student_id))) {
+  //           if (stu.present)
+  //             studentMap3.set(
+  //               String(stu.student_id),
+  //               studentMap3.get(String(stu.student_id)) + 1
+  //             );
+  //         } else {
+  //           if (stu.present) studentMap3.set(String(stu.student_id), 1);
+  //           else studentMap3.set(String(stu.student_id), 0);
+  //         }
+  //       });
+  //     });
+
+  //     let arrStudents = [];
+  //     for (const key of studentMap1.keys()) {
+  //       if (
+  //         studentMap1.get(key) / days1 < studentMap2.get(key) / days2 &&
+  //         studentMap2.get(key) / days2 < studentMap3.get(key) / days3
+  //       )
+  //         arrStudents.push({ student: key, down: true });
+  //       else arrStudents.push({ student: key, down: false });
+  //     }
+  //     res.json(arrStudents);
+  //   } catch (err) {
+  //     res.json(err);
+  //   }
+  // },
   getMapsByDateAndClass: async (req, res) => {
     try {
       const { classId, date } = req.body;
@@ -315,6 +435,15 @@ exports.classCtrl = {
       if (!class1) {
         return res.status(404).json({ error: "Class not found" });
       }
+
+      let students = await StudentModel.find({
+        class_id: classId
+      }).populate("user_id", {
+        password: 0,
+      });
+      let filterStudents = students.filter(student => student.user_id.active);
+      let filterStudentsID = filterStudents.map(student => String(student.user_id._id));
+      // console.log(filterStudentsID)
 
       let year = fullDate1.getFullYear();
       let month = fullDate1.getMonth();
@@ -335,22 +464,26 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year == yearE && month == monthE;
       });
-      // if (attendanceEntry1.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days1 = attendanceEntry1.length;
       attendanceEntry1.forEach((item) => {
-        item.students_attendance.forEach((stu) => {
-          if (studentMap1.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap1.set(
-                String(stu.student_id),
-                studentMap1.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap1.set(String(stu.student_id), 1);
-            else studentMap1.set(String(stu.student_id), 0);
+        item.students_attendance.forEach(async (stu) => {
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap1.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap1.set(
+                  String(stu.student_id),
+                  studentMap1.get(String(stu.student_id)) + 1
+                );
+            } else {
+
+              if (stu.present) {
+                studentMap1.set(String(stu.student_id), 1)
+                  ;
+              }
+              else studentMap1.set(String(stu.student_id), 0);
+            }
           }
+
         });
       });
       //-----2
@@ -360,21 +493,20 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year2 == yearE && month2 == monthE;
       });
-      // if (attendanceEntry2.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days2 = attendanceEntry2.length;
       attendanceEntry2.forEach((item) => {
         item.students_attendance.forEach((stu) => {
-          if (studentMap2.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap2.set(
-                String(stu.student_id),
-                studentMap2.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap2.set(String(stu.student_id), 1);
-            else studentMap2.set(String(stu.student_id), 0);
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap2.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap2.set(
+                  String(stu.student_id),
+                  studentMap2.get(String(stu.student_id)) + 1
+                );
+            } else {
+              if (stu.present) studentMap2.set(String(stu.student_id), 1);
+              else studentMap2.set(String(stu.student_id), 0);
+            }
           }
         });
       });
@@ -385,22 +517,22 @@ exports.classCtrl = {
         let monthE = fullDateE.getMonth();
         return year3 == yearE && month3 == monthE;
       });
-      // if (attendanceEntry3.length < 1) {
-      //     return res.json({ msg: "No attendance report was found for this month and year" });
-      // }
       let days3 = attendanceEntry3.length;
       attendanceEntry3.forEach((item) => {
         item.students_attendance.forEach((stu) => {
-          if (studentMap3.has(String(stu.student_id))) {
-            if (stu.present)
-              studentMap3.set(
-                String(stu.student_id),
-                studentMap3.get(String(stu.student_id)) + 1
-              );
-          } else {
-            if (stu.present) studentMap3.set(String(stu.student_id), 1);
-            else studentMap3.set(String(stu.student_id), 0);
+          if (filterStudentsID.includes(String(stu.student_id))) {
+            if (studentMap3.has(String(stu.student_id))) {
+              if (stu.present)
+                studentMap3.set(
+                  String(stu.student_id),
+                  studentMap3.get(String(stu.student_id)) + 1
+                );
+            } else {
+              if (stu.present) studentMap3.set(String(stu.student_id), 1);
+              else studentMap3.set(String(stu.student_id), 0);
+            }
           }
+
         });
       });
       let arrStudents = [];
@@ -415,6 +547,78 @@ exports.classCtrl = {
       res.json(arrStudents);
     } catch (err) {
       res.json(err);
+    }
+  },
+
+  deleteStudentAndAttendance: async (req, res) => {
+    const { studIdCard } = req.params;
+    const { classId } = req.body;
+
+    try {
+      const user = await UserModel.findOne({
+        idCard: studIdCard,
+        active: true,
+      });
+
+      if (!user) {
+        return res.status(404).json({ msg: "user not found" });
+      }
+
+      const student = await StudentModel.findOne({
+        user_id: user._id,
+      }).populate("user_id", { password: 0 });
+
+      if (!student) {
+        return res.status(404).json({ msg: "student not found" });
+      }
+
+      // const cls = await ClassModel.findOne(
+      //   { _id: classId, active: true }
+      //   // { $pull: { 'attendance_list.$[].students_attendance': { student_id: student._id } } },
+      //   // { new: true }
+      // );
+      // const newAttArr = [];
+      // for (const att_arr in cls.attendance_list){
+      //   let filterData = att_arr.students_attendance.filter(item => item.student_id != user._id);
+      //   let newobj = {
+      //     _id: att_arr._id,
+      //     date: att_arr.date,
+      //     students_attendance: filterData
+      //   }
+      //   newAttArr.push(newobj);
+      // }
+      // const cls2 = await ClassModel.updateOne(
+      //   { _id: classId, active: true },
+      //   {$set {attendance_list: newAttArr}}
+
+      // );
+      const cls = await ClassModel.findOne({ _id: classId, active: true });
+
+      const newAttArr = cls.attendance_list.map((att_arr) => {
+        const filterData = att_arr.students_attendance.filter(
+          (item) => String(item.student_id) !== String(user._id)
+        );
+        return {
+          _id: att_arr._id,
+          date: att_arr.date,
+          students_attendance: filterData,
+        };
+      });
+
+      const cls2 = await ClassModel.updateOne(
+        { _id: classId, active: true },
+        { $set: { attendance_list: newAttArr } }
+      );
+
+      console.log("cls2", cls2);
+
+      res.json({
+        success: true,
+        message: "Student and attendance records deleted successfully",
+      });
+    } catch (err) {
+      console.error("Error deleting student and attendance records:", err);
+      res.status(500).json({ error: "Internal server error" });
     }
   },
 };
