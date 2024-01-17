@@ -29,7 +29,7 @@ router.get("/attendance/:id", auth, authRole("teacher"), studentCtrl.getAttendan
 
 // router.post("/questionnaire", auth, authRole("student"), studentCtrl.addNewQuestionnaireAnswer);
 
-router.put("/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
+router.put("/edit/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateStudent);
 
 router.patch("/updateLastQuestionnaireAnsweredDate/:id", auth, authRole(["teacher", "student"]), studentCtrl.updateLastQuestionnaireAnsweredDate);
 

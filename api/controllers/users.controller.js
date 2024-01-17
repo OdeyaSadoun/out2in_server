@@ -52,18 +52,21 @@ exports.userlCtrl = {
   editUser: async (req, res) => {
     console.log("edit");
     let { idEdit } = req.params;
-    let validBody = userValidate(req.body);
-    if (validBody.error) {
-      return res.status(400).json(validBody.error.details);
-    }
+    console.log(idEdit);
+    console.log(req.body);
+    // let validBody = userValidate(req.body);
+    // if (validBody.error) {
+    //   return res.status(401).json(validBody.error.details);
+    // }
     try {
       let data;
-      if (req.tokenData.role == "admin" || idEdit == req.tokenData._id) {
-        req.body.password = await bcrypt.hash(req.body.password, 10);
+      if (req.tokenData.role == "admin" || req.tokenData.role == "teacher" || idEdit == req.tokenData._id) {
+        // req.body.password = await bcrypt.hash(req.body.password, 10);
         data = await UserModel.updateOne(
           { _id: idEdit, active: "true" },
-          req.body
+          req.body.user
         );
+        console.log(data);
       } else {
         data = [
           {

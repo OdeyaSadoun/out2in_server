@@ -245,8 +245,8 @@ exports.authCtrl = {
 
   changePassword: async (req, res) => {
     try {
+      console.log(req.body.newPassword);
       let pass = await bcrypt.hash(req.body.newPassword, 10);
-      console.log(pass);
       let data = await UserModel.updateOne(
         { _id: req.tokenData._id, active: "true" },
         { $set: { password: pass } }
