@@ -14,8 +14,8 @@ const {
 
 const createResetToken = () => {
   const resetToken = crypto
-    .randomBytes(32) 
-    .toString("hex"); 
+    .randomBytes(32)
+    .toString("hex");
 
   passwordResetToken = crypto //saving the encrypted reset token into db
     .createHash("sha256")
@@ -24,8 +24,35 @@ const createResetToken = () => {
 
   passwordResetExpires = Date.now() + 10 * 1000 * 60; //milliseconds 10 min
 
-  return {passwordResetToken,passwordResetExpires};
+  return { passwordResetToken, passwordResetExpires };
 }
+
+// const sendEmail = async (options) => {
+//   ///1 create transporter
+//   const transporter = nodemailer.createTransport({
+//     // host: process.env.EMAIL_HOST,
+
+//     // port: process.env.EMAIL_PORT || 2525,
+//     /* secure: false, */
+//     service:"gmail",
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASSWORD,
+//     },
+
+//     //In gmail use less secure app option
+//   });
+//   ///2 Define email options
+//   const mailOptions = {
+//     from: "out2in.siders@gmail.com",
+//     to: options.email,
+//     subject: options.subject,
+//     html: options.text,
+//     //html
+//   };
+//   ///3 send the email
+//   await transporter.sendMail(mailOptions);
+// };
 
 
 const sendEmail = (req) => {
@@ -43,7 +70,7 @@ const sendEmail = (req) => {
     from: "out2in.siders@gmail.com",
     to: req.email,
     subject: req.subject,
-    text: req.text,
+    html: req.text,
   };
 
   // Send the email
@@ -200,19 +227,19 @@ exports.authCtrl = {
   },
 
   login: async (req, res) => {
-    let validBody = loginValidate(req.body);
-    if (validBody.error) {
-      return res.status(400).json(validBody.error.details);
-    }
+    // let validBody = loginValidate(req.body);
+    // if (validBody.error) {
+    //   return res.status(400).json(validBody.error.details);
+    // }
     try {
       let user = await UserModel.findOne({
-        email: req.body.email,
+        idCard: req.body.idCard,
         active: "true",
       });
       if (!user) {
         return res
           .status(401)
-          .json({ msg: "There is no user with this email" });
+          .json({ msg: "There is no user with this id" });
       }
       let authPassword = await bcrypt.compare(req.body.password, user.password);
       if (!authPassword) {
@@ -335,8 +362,9 @@ exports.authCtrl = {
           let toSend = {
             email: email,
             subject: "קיבלנו את בקשתך לאיפוס סיסמה",
-            text: `<div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-     <h3 style="color: darkblue; font-size: 20px;">קיבלנו את בקשתך לאיפוס סיסמה</h3>
+            text: `<div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align:center">
+    <a href="http://localhost:5173/" style="color: darkblue; text-decoration: none;">    <img src="https://yt3.ggpht.com/Tt-Z-wMfAUv1wC9C7MTVX0CO-uvDL86EtHM3j4st-yfZEG-wPk1TphE7TPuwn9eKsikCpGR_=s600-c-k-c0x00ffffff-no-rj-rp-mo" width="15%"> </a>
+     <h3 style="color: blueviolet; font-size: 20px;">קיבלנו את בקשתך לאיפוס סיסמה</h3>
      <p style="color: #343a40; font-size: 16px; line-height: 1.6;">תוכל לאפס את הסיסמה באמצעות הקישור המצורף. <br/>שים לב, הקישור תקף ל10 דקות בלבד.</p>
      <span style="color: black; font-size: 14px;"> לאיפוס הסיסמה <a href="http://localhost:5173/reset_password/${passwordResetToken}" style="color: darkblue; text-decoration: none;">לחץ כאן</a></span>
      </div>`,
