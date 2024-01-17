@@ -28,12 +28,9 @@ exports.registerValidate = (_reqBody) => {
 
 exports.loginValidate = (_reqBody) => {
   let userValidate = Joi.object({
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: { allow: ["com", "net"] },
-      })
-      .required(),
+    idCard: Joi.string()
+    .pattern(new RegExp("/^\d{9,10}$/"))
+    .required(),
     password: Joi.string()
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
