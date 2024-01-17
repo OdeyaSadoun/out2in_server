@@ -135,7 +135,7 @@ exports.friendCtrl = {
       } = req.body;
       try {
         const response = await axios.post(
-          "http://127.0.0.1:5000/calculate_social_index",
+          "https://out2in-python-server.onrender.com",
           {
             friends_list,
             grades_record,
