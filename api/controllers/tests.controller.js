@@ -54,7 +54,7 @@ const getTestsBalanceByStudentId = async (studentId, class_id) => {
     const avgGrades2 = gradesCount2 == 0 ? 0 : gradesSum2 / gradesCount2;
     const avgGrades3 = gradesCount3 == 0 ? 0 : gradesSum3 / gradesCount3;
     console.log(avgGrades1, avgGrades2, avgGrades3);
-    if (avgGrades3 < avgGrades2 && avgGrades2 < avgGrades1) {
+    if (avgGrades3 > avgGrades2 && avgGrades2 > avgGrades1) {
       console.log("yes");
       return true;
     }
